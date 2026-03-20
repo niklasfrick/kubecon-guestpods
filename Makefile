@@ -1,10 +1,18 @@
-.PHONY: dev build test test-go test-web clean
+.PHONY: dev dev-server dev-web build build-web test test-go test-web clean
 
-# Go server on port 8080
+# Run Go server + Vite dev server concurrently
 dev:
+	@echo "Starting Go server on :8080 and Vite dev server on :5173"
+	@echo "Open http://localhost:5173 for hot-reload development"
+	$(MAKE) dev-server & $(MAKE) dev-web && wait
+
+dev-server:
 	go run .
 
-# Build production binary (requires web/dist to exist)
+dev-web:
+	cd web && npm run dev
+
+# Build production binary with embedded frontend
 build: build-web
 	go build -o bin/guestbook .
 
@@ -25,4 +33,4 @@ test-web:
 
 # Clean build artifacts
 clean:
-	rm -rf bin/ web/dist/ guestbook.db
+	rm -rf bin/ web/dist/ web/node_modules/ guestbook.db guestbook.db-wal guestbook.db-shm
