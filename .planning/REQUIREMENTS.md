@@ -9,13 +9,13 @@ Requirements for the live KubeCon talk. Each maps to roadmap phases.
 
 ### Submission
 
-- [ ] **SUBM-01**: Attendee can access the guestbook via QR code displayed on a presentation slide
-- [ ] **SUBM-02**: Attendee can access the guestbook via a short memorable URL (e.g., kubecon.niklas.dev)
-- [ ] **SUBM-03**: Attendee can submit their name on a mobile-friendly form
-- [ ] **SUBM-04**: Attendee can select their location from a pre-defined dropdown
-- [ ] **SUBM-05**: Attendee can select a homelab emoji from a curated grid of 15-25 themed emojis
-- [ ] **SUBM-06**: Attendee sees a "You're now a pod in the cluster!" confirmation after submitting
-- [ ] **SUBM-07**: Name field is filtered against a profanity blocklist before accepting submission
+- [x] **SUBM-01**: Attendee can access the guestbook via QR code displayed on a presentation slide
+- [x] **SUBM-02**: Attendee can access the guestbook via a short memorable URL (e.g., kubecon.niklas.dev)
+- [x] **SUBM-03**: Attendee can submit their name on a mobile-friendly form
+- [x] **SUBM-04**: Attendee can select their location from a pre-defined dropdown
+- [x] **SUBM-05**: Attendee can select a homelab emoji from a curated grid of 15-25 themed emojis
+- [x] **SUBM-06**: Attendee sees a "You're now a pod in the cluster!" confirmation after submitting
+- [x] **SUBM-07**: Name field is filtered against a profanity blocklist before accepting submission
 
 ### Visualization
 
@@ -76,13 +76,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SUBM-01 | Phase 1 | Pending |
-| SUBM-02 | Phase 1 | Pending |
-| SUBM-03 | Phase 1 | Pending |
-| SUBM-04 | Phase 1 | Pending |
-| SUBM-05 | Phase 1 | Pending |
-| SUBM-06 | Phase 1 | Pending |
-| SUBM-07 | Phase 1 | Pending |
+| SUBM-01 | Phase 1 | Complete |
+| SUBM-02 | Phase 1 | Complete |
+| SUBM-03 | Phase 1 | Complete |
+| SUBM-04 | Phase 1 | Complete |
+| SUBM-05 | Phase 1 | Complete |
+| SUBM-06 | Phase 1 | Complete |
+| SUBM-07 | Phase 1 | Complete |
 | VIZZ-01 | Phase 2 | Pending |
 | VIZZ-02 | Phase 2 | Pending |
 | VIZZ-03 | Phase 2 | Pending |

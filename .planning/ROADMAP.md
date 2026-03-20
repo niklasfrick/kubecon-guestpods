@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Go server core: SQLite store, REST API, SSE broadcaster, profanity filter, QR code, tests
+- [x] 01-01-PLAN.md -- Go server core: SQLite store, REST API, SSE broadcaster, profanity filter, QR code, tests
 - [ ] 01-02-PLAN.md -- Preact frontend: mobile submission form, country dropdown, homelab scale, confirmation, build integration
 
 ### Phase 2: Visualization Engine
