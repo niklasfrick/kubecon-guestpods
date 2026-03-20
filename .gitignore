@@ -1,0 +1,6 @@
+guestbook.db
+guestbook.db-wal
+guestbook.db-shm
+web/node_modules/
+web/dist/
+bin/
