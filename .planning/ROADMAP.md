@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Submitting a name containing profanity is rejected with a user-friendly message
   4. A QR code is generated that resolves to the submission form URL
   5. An SSE client connected to the server receives a new-submission event within 2 seconds of form submission (verifiable via curl or browser DevTools)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Go server core: SQLite store, REST API, SSE broadcaster, profanity filter, QR code, tests
+- [ ] 01-02-PLAN.md -- Preact frontend: mobile submission form, country dropdown, homelab scale, confirmation, build integration
 
 ### Phase 2: Visualization Engine
 **Goal**: New submissions appear as animated pods in a full-screen K8s cluster visualization, grouped into namespace clusters by location, suitable for a 1920x1080 projector
@@ -88,7 +88,7 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Server Core + Submission Form | 0/? | Not started | - |
+| 1. Server Core + Submission Form | 0/2 | Planning complete | - |
 | 2. Visualization Engine | 0/? | Not started | - |
 | 3. Admin Panel | 0/? | Not started | - |
 | 4. Deployment + Validation | 0/? | Not started | - |
