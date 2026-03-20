@@ -64,6 +64,9 @@ func (h *SSEHub) HandleSSE() http.HandlerFunc {
 		w.Header().Set("Connection", "keep-alive")
 		w.Header().Set("X-Accel-Buffering", "no")
 
+		// Flush headers immediately so the client knows it's connected
+		flusher.Flush()
+
 		ch := h.Subscribe()
 		defer h.Unsubscribe(ch)
 
