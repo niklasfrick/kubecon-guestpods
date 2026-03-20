@@ -76,38 +76,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SUBM-01 | — | Pending |
-| SUBM-02 | — | Pending |
-| SUBM-03 | — | Pending |
-| SUBM-04 | — | Pending |
-| SUBM-05 | — | Pending |
-| SUBM-06 | — | Pending |
-| SUBM-07 | — | Pending |
-| VIZZ-01 | — | Pending |
-| VIZZ-02 | — | Pending |
-| VIZZ-03 | — | Pending |
-| VIZZ-04 | — | Pending |
-| VIZZ-05 | — | Pending |
-| VIZZ-06 | — | Pending |
-| VIZZ-07 | — | Pending |
-| VIZZ-08 | — | Pending |
-| VIZZ-09 | — | Pending |
-| VIZZ-10 | — | Pending |
-| ADMN-01 | — | Pending |
-| ADMN-02 | — | Pending |
-| ADMN-03 | — | Pending |
-| ADMN-04 | — | Pending |
-| ADMN-05 | — | Pending |
-| INFR-01 | — | Pending |
-| INFR-02 | — | Pending |
-| INFR-03 | — | Pending |
-| INFR-04 | — | Pending |
+| SUBM-01 | Phase 1 | Pending |
+| SUBM-02 | Phase 1 | Pending |
+| SUBM-03 | Phase 1 | Pending |
+| SUBM-04 | Phase 1 | Pending |
+| SUBM-05 | Phase 1 | Pending |
+| SUBM-06 | Phase 1 | Pending |
+| SUBM-07 | Phase 1 | Pending |
+| VIZZ-01 | Phase 2 | Pending |
+| VIZZ-02 | Phase 2 | Pending |
+| VIZZ-03 | Phase 2 | Pending |
+| VIZZ-04 | Phase 2 | Pending |
+| VIZZ-05 | Phase 2 | Pending |
+| VIZZ-06 | Phase 2 | Pending |
+| VIZZ-07 | Phase 2 | Pending |
+| VIZZ-08 | Phase 2 | Pending |
+| VIZZ-09 | Phase 2 | Pending |
+| VIZZ-10 | Phase 2 | Pending |
+| ADMN-01 | Phase 3 | Pending |
+| ADMN-02 | Phase 3 | Pending |
+| ADMN-03 | Phase 3 | Pending |
+| ADMN-04 | Phase 3 | Pending |
+| ADMN-05 | Phase 3 | Pending |
+| INFR-01 | Phase 4 | Pending |
+| INFR-02 | Phase 4 | Pending |
+| INFR-03 | Phase 4 | Pending |
+| INFR-04 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-20*
-*Last updated: 2026-03-20 after initial definition*
+*Last updated: 2026-03-20 after roadmap creation*
