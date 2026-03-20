@@ -43,7 +43,7 @@ Requirements for the live KubeCon talk. Each maps to roadmap phases.
 - [ ] **INFR-01**: Application is containerized and deployable on a homelab Kubernetes cluster
 - [ ] **INFR-02**: Data persists across pod restarts (survives redeployment)
 - [ ] **INFR-03**: Application handles burst traffic of 500 concurrent submissions within 60 seconds
-- [ ] **INFR-04**: Submission form page loads in under 2 seconds on 4G / conference WiFi
+- [x] **INFR-04**: Submission form page loads in under 2 seconds on 4G / conference WiFi
 
 ## v2 Requirements
 
@@ -101,7 +101,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFR-01 | Phase 4 | Pending |
 | INFR-02 | Phase 4 | Pending |
 | INFR-03 | Phase 4 | Pending |
-| INFR-04 | Phase 1 | Pending |
+| INFR-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total

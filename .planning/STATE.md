@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-20T20:43:04Z"
-last_activity: 2026-03-20 -- Completed Plan 01-01 (Go server core)
+status: completed
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-20T21:03:44.203Z"
+last_activity: 2026-03-20 -- Completed Plan 01-02 (Preact submission form)
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 12
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -25,29 +25,29 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 
 ## Current Position
 
-Phase: 1 of 4 (Server Core + Submission Form)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-20 -- Completed Plan 01-01 (Go server core)
+Phase: 1 of 4 (Server Core + Submission Form) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase 1 complete, ready for Phase 2
+Last activity: 2026-03-20 -- Completed Plan 01-02 (Preact submission form)
 
-Progress: [█░░░░░░░░░] 12%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 10 min
-- Total execution time: 0.17 hours
+- Total plans completed: 2
+- Average duration: 9 min
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 - Server Core | 1/2 | 10 min | 10 min |
+| 1 - Server Core | 2/2 | 18 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (10 min)
-- Trend: First plan
+- Last 5 plans: 01-01 (10 min), 01-02 (8 min)
+- Trend: Consistent
 
 *Updated after each plan completion*
 
@@ -64,6 +64,10 @@ Recent decisions affecting current work:
 - [01-01]: SSE handler flushes headers immediately so clients connect without waiting for first event
 - [01-01]: Used rune length for 30-char name limit to support Unicode names
 - [01-01]: Profanity checker does case-insensitive exact match against false positive names before go-away
+- [01-02]: Preact signals for global form state (formState, submissionData) -- lightweight reactivity without Redux boilerplate
+- [01-02]: Native HTML select with optgroups for country dropdown -- works perfectly on mobile
+- [01-02]: localStorage persistence prevents duplicate submissions on page reload
+- [01-02]: Bundle 14.8KB gzipped (JS 13.2KB + CSS 1.6KB) -- well under 50KB INFR-04 target
 
 ### Pending Todos
 
@@ -75,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:43:04Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-server-core-submission-form/01-02-PLAN.md
+Last session: 2026-03-20T21:03:44.202Z
+Stopped at: Completed 01-02-PLAN.md
+Resume file: None

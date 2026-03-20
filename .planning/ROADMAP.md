@@ -12,7 +12,7 @@ This roadmap delivers a live KubeCon audience participation app in four phases f
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Server Core + Submission Form** - End-to-end data pipeline: monorepo, database, API, SSE broadcaster, and mobile-friendly submission form
+- [x] **Phase 1: Server Core + Submission Form** - End-to-end data pipeline: monorepo, database, API, SSE broadcaster, and mobile-friendly submission form (completed 2026-03-20)
 - [ ] **Phase 2: Visualization Engine** - Real-time K8s cluster visualization with D3 force-based namespace clustering and Canvas rendering
 - [ ] **Phase 3: Admin Panel** - Presenter control surface: submission toggle, moderation, stats, and post-talk read-only mode
 - [ ] **Phase 4: Deployment + Validation** - Containerize, deploy to homelab K8s, load test at 500 concurrent users, and rehearse the live demo
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Go server core: SQLite store, REST API, SSE broadcaster, profanity filter, QR code, tests
-- [ ] 01-02-PLAN.md -- Preact frontend: mobile submission form, country dropdown, homelab scale, confirmation, build integration
+- [x] 01-02-PLAN.md -- Preact frontend: mobile submission form, country dropdown, homelab scale, confirmation, build integration
 
 ### Phase 2: Visualization Engine
 **Goal**: New submissions appear as animated pods in a full-screen K8s cluster visualization, grouped into namespace clusters by location, suitable for a 1920x1080 projector
@@ -88,7 +88,7 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Server Core + Submission Form | 0/2 | Planning complete | - |
+| 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
 | 2. Visualization Engine | 0/? | Not started | - |
 | 3. Admin Panel | 0/? | Not started | - |
 | 4. Deployment + Validation | 0/? | Not started | - |
