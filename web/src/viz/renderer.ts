@@ -220,36 +220,50 @@ function drawNamespaceLabel(ctx: CanvasRenderingContext2D, cluster: ClusterData)
  * @param nodes - All PodNodes (including invisible ones with animProgress=0)
  * @param width - Canvas CSS width in pixels
  * @param height - Canvas CSS height in pixels
+ * @param transform - Optional pan/zoom transform {x, y, k}
  */
 export function drawFrame(
   ctx: CanvasRenderingContext2D,
   nodes: PodNode[],
   width: number,
-  height: number
+  height: number,
+  transform?: { x: number; y: number; k: number }
 ): void {
-  // 1. Background fill
+  // 1. Background fill (before transform -- fills full screen)
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Compute clusters from visible nodes
+  // 2. Apply pan/zoom transform for all world-space drawing
+  if (transform) {
+    ctx.save();
+    ctx.translate(transform.x, transform.y);
+    ctx.scale(transform.k, transform.k);
+  }
+
+  // 3. Compute clusters from visible nodes
   const clusters = computeClusters(nodes);
 
-  // 3. Draw cluster boundaries (behind pods)
+  // 4. Draw cluster boundaries (behind pods)
   for (const cluster of clusters) {
     drawClusterBoundary(ctx, cluster);
   }
 
-  // 4. Draw namespace labels
+  // 5. Draw namespace labels
   for (const cluster of clusters) {
     drawNamespaceLabel(ctx, cluster);
   }
 
-  // 5. Draw pods (sorted by animProgress so newly-animating pods draw on top)
+  // 6. Draw pods (sorted by animProgress so newly-animating pods draw on top)
   const visibleNodes = nodes.filter(n => n.animProgress > 0);
   visibleNodes.sort((a, b) => a.animProgress - b.animProgress);
   for (const node of visibleNodes) {
     drawPod(ctx, node);
+  }
+
+  // 7. Restore transform
+  if (transform) {
+    ctx.restore();
   }
 }
 
