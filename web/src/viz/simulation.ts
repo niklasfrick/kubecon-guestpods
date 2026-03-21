@@ -2,7 +2,7 @@ import { forceSimulation, forceManyBody, forceCollide, forceCenter, forceX, forc
 import type { Simulation } from 'd3-force';
 import type { PodNode } from './types';
 import type { SubmitResponse } from '../api';
-import { clusterForce } from './clusterForce';
+import { clusterForce, clusterRepulsionForce } from './clusterForce';
 
 /** Convert a SubmitResponse from the API into a PodNode for the simulation. */
 export function toPodNode(s: SubmitResponse): PodNode {
@@ -30,12 +30,13 @@ export function createSimulation(
   height: number
 ): Simulation<PodNode, undefined> {
   const sim = forceSimulation<PodNode>([])
-    .force('charge', forceManyBody<PodNode>().strength(-30).distanceMax(200))
-    .force('collide', forceCollide<PodNode>().radius(35).iterations(2))
-    .force('center', forceCenter(width / 2, height / 2).strength(0.05))
+    .force('charge', forceManyBody<PodNode>().strength(-50).distanceMax(200))
+    .force('collide', forceCollide<PodNode>().radius(40).iterations(3))
+    .force('center', forceCenter(width / 2, height / 2).strength(0.02))
     .force('cluster', clusterForce(0.15))
-    .force('x', forceX<PodNode>(width / 2).strength(0.02))
-    .force('y', forceY<PodNode>(height / 2).strength(0.02))
+    .force('clusterRepulsion', clusterRepulsionForce(0.8, 150))
+    .force('x', forceX<PodNode>(width / 2).strength(0.01))
+    .force('y', forceY<PodNode>(height / 2).strength(0.01))
     .alphaDecay(0.02)
     .velocityDecay(0.3)
     .stop(); // We drive ticks manually via requestAnimationFrame
@@ -61,7 +62,7 @@ export function addNodes(
 
 /**
  * Pre-compute layout for initial load.
- * Adds all nodes to simulation and runs 120 ticks synchronously
+ * Adds all nodes to simulation and runs 200 ticks synchronously
  * to settle the layout before visual cascade begins (per RESEARCH.md Pitfall 6).
  */
 export function precomputeLayout(
@@ -70,7 +71,7 @@ export function precomputeLayout(
 ): void {
   sim.nodes(nodes);
   sim.alpha(1);
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 200; i++) {
     sim.tick();
   }
   // After pre-computation, set low alpha so it stays mostly settled
