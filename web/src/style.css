@@ -334,3 +334,64 @@ body {
     padding: var(--space-lg) 12px;
   }
 }
+
+/* === Visualization Page Overlays === */
+
+.stats-overlay {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(15, 23, 42, 0.80);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  pointer-events: none;
+}
+
+.stats-separator {
+  margin: 0 8px;
+  color: var(--color-text-secondary);
+}
+
+.hover-card {
+  position: fixed;
+  z-index: 20;
+  max-width: 220px;
+  background: rgba(15, 23, 42, 0.90);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px;
+  pointer-events: none;
+  font-family: var(--font-family);
+}
+
+.hover-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.hover-card-namespace {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.hover-card-level {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}

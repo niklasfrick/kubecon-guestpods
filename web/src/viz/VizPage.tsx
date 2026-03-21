@@ -8,6 +8,8 @@ import { drawFrame, updateAnimations, computeStats } from './renderer';
 import { AnimationQueue } from './animationQueue';
 import { connectSSE } from './sseClient';
 import { BG_COLOR } from './colors';
+import { StatsOverlay } from './StatsOverlay';
+import { HoverCard, hoveredPod, hoverPos } from './HoverCard';
 
 /** Reactive stats for the DOM overlay (updated from render loop). */
 export const podCount = signal(0);
@@ -139,6 +141,40 @@ export function VizPage() {
 
     init();
 
+    // --- Hover detection ---
+    let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    function onMouseMove(e: MouseEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // simulation.find() uses CSS-space coordinates (not pixel-space)
+      // per RESEARCH.md Pitfall 7
+      const found = sim.find(x, y, 20) as PodNode | undefined;
+
+      if (found && found.animProgress > 0) {
+        if (hideTimeout) {
+          clearTimeout(hideTimeout);
+          hideTimeout = null;
+        }
+        hoveredPod.value = found;
+        hoverPos.value = { x: found.x!, y: found.y! };
+        canvas!.style.cursor = 'pointer';
+      } else {
+        // 100ms hide delay to prevent flicker (per UI-SPEC)
+        if (!hideTimeout) {
+          hideTimeout = setTimeout(() => {
+            hoveredPod.value = null;
+            hideTimeout = null;
+          }, 100);
+        }
+        canvas!.style.cursor = 'default';
+      }
+    }
+
+    canvas!.addEventListener('mousemove', onMouseMove);
+
     // --- Resize handler ---
     let resizeTimer: ReturnType<typeof setTimeout>;
     function onResize() {
@@ -157,22 +193,28 @@ export function VizPage() {
       sim.stop();
       queue.destroy();
       sseCleanup?.();
+      canvas!.removeEventListener('mousemove', onMouseMove);
+      if (hideTimeout) clearTimeout(hideTimeout);
       window.removeEventListener('resize', onResize);
       clearTimeout(resizeTimer);
     };
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      role="img"
-      aria-label="Live visualization of 0 attendee pods in 0 namespace clusters"
-      style={{
-        display: 'block',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-      }}
-    />
+    <div>
+      <canvas
+        ref={canvasRef}
+        role="img"
+        aria-label="Live visualization of 0 attendee pods in 0 namespace clusters"
+        style={{
+          display: 'block',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+        }}
+      />
+      <StatsOverlay />
+      <HoverCard />
+    </div>
   );
 }
