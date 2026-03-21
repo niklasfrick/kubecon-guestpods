@@ -20,15 +20,15 @@ Requirements for the live KubeCon talk. Each maps to roadmap phases.
 ### Visualization
 
 - [x] **VIZZ-01**: New submissions appear as pods on the visualization screen within 1-2 seconds via SSE
-- [ ] **VIZZ-02**: Pods are grouped into namespace clusters based on attendee location
-- [ ] **VIZZ-03**: Namespace clusters are labeled with K8s-style naming (e.g., ns/berlin, ns/london)
-- [ ] **VIZZ-04**: New pods animate in smoothly (fade/slide entrance animation)
+- [x] **VIZZ-02**: Pods are grouped into namespace clusters based on attendee location
+- [x] **VIZZ-03**: Namespace clusters are labeled with K8s-style naming (e.g., ns/berlin, ns/london)
+- [x] **VIZZ-04**: New pods animate in smoothly (fade/slide entrance animation)
 - [x] **VIZZ-05**: Pods use K8s-themed visual language (rounded-rect shapes, status indicators, labels)
 - [x] **VIZZ-06**: Pods display the attendee's name and selected emoji
-- [ ] **VIZZ-07**: Pods arrange organically within namespace boundaries using D3 force simulation
+- [x] **VIZZ-07**: Pods arrange organically within namespace boundaries using D3 force simulation
 - [ ] **VIZZ-08**: Live stats overlay shows total pod count and namespace count on the visualization
 - [ ] **VIZZ-09**: Presenter can hover over pods to see full attendee details (name, location, emoji)
-- [ ] **VIZZ-10**: Visualization handles 100-500 pods without performance degradation
+- [x] **VIZZ-10**: Visualization handles 100-500 pods without performance degradation
 
 ### Admin
 
@@ -84,15 +84,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUBM-06 | Phase 1 | Complete |
 | SUBM-07 | Phase 1 | Complete |
 | VIZZ-01 | Phase 2 | Complete |
-| VIZZ-02 | Phase 2 | Pending |
-| VIZZ-03 | Phase 2 | Pending |
-| VIZZ-04 | Phase 2 | Pending |
+| VIZZ-02 | Phase 2 | Complete |
+| VIZZ-03 | Phase 2 | Complete |
+| VIZZ-04 | Phase 2 | Complete |
 | VIZZ-05 | Phase 2 | Complete |
 | VIZZ-06 | Phase 2 | Complete |
-| VIZZ-07 | Phase 2 | Pending |
+| VIZZ-07 | Phase 2 | Complete |
 | VIZZ-08 | Phase 2 | Pending |
 | VIZZ-09 | Phase 2 | Pending |
-| VIZZ-10 | Phase 2 | Pending |
+| VIZZ-10 | Phase 2 | Complete |
 | ADMN-01 | Phase 3 | Pending |
 | ADMN-02 | Phase 3 | Pending |
 | ADMN-03 | Phase 3 | Pending |
