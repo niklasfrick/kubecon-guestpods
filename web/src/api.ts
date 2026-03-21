@@ -44,6 +44,15 @@ export async function submitEntry(
   return body as SubmitResponse;
 }
 
+/** Fetch all existing submissions for initial visualization load. */
+export async function fetchSubmissions(): Promise<SubmitResponse[]> {
+  const res = await fetch('/api/submissions');
+  if (!res.ok) {
+    throw new Error(`Failed to load submissions: ${res.status}`);
+  }
+  return res.json();
+}
+
 export class SubmissionError extends Error {
   field?: string;
   status: number;
