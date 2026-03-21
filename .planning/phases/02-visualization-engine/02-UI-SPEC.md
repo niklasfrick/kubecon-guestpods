@@ -33,15 +33,18 @@ Declared values (must be multiples of 4):
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| xs | 4px | Padding inside namespace label badges |
-| sm | 8px | Gap between stat items in overlay, HoverCard inner padding |
-| md | 16px | HoverCard outer padding, overlay margin from viewport edge |
+| xs | 4px | Padding inside namespace label badges (vertical) |
+| sm | 8px | Gap between stat items in overlay, namespace label badge horizontal padding |
+| compact | 12px | HoverCard inner padding, stats overlay vertical/horizontal inner padding |
+| md | 16px | HoverCard outer margin from viewport, overlay margin from viewport edge |
 | lg | 24px | Canvas hull padding around cluster nodes |
 | xl | 32px | Not used this phase |
 | 2xl | 48px | Not used this phase |
 | 3xl | 64px | Not used this phase |
 
-Exceptions: Canvas hull padding uses 25px (nearest practical value for convex hull expansion; not a DOM spacing token).
+Exceptions:
+- Canvas hull padding uses 25px (nearest practical value for convex hull expansion; not a DOM spacing token).
+- Namespace badge gap above hull uses 8px (`sm` token) for vertical clearance between label and hull top edge.
 
 ---
 
@@ -52,7 +55,7 @@ Exceptions: Canvas hull padding uses 25px (nearest practical value for convex hu
 | Role | Font String | Weight | Usage |
 |------|------------|--------|-------|
 | Pod label | `11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` | 400 (normal) | Emoji + truncated name inside each pod |
-| Namespace badge | `bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` | 700 (bold) | Flag + ns/CODE label above cluster hull |
+| Namespace badge | `600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif` | 600 (semibold) | Flag + ns/CODE label above cluster hull |
 | Emoji | `14px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif` | 400 | Standalone emoji rendering when emoji sizing needs override |
 
 ### DOM Overlays (CSS)
@@ -63,15 +66,19 @@ Exceptions: Canvas hull padding uses 25px (nearest practical value for convex hu
 | HoverCard heading (name) | 16px | 600 | 1.2 |
 | HoverCard body (namespace, level) | 14px | 400 | 1.5 |
 
+**Weight scale:** 2 weights only -- 400 (normal) and 600 (semibold). No other weights permitted this phase.
+
 ---
 
 ## Color
+
+**Color distribution: ~60% dark background (#0f172a slate-900 canvas fill), ~30% neutral surfaces (translucent overlays, namespace badges, cluster boundary fills), ~10% level-color pod accents (5 homelab level colors).**
 
 ### Canvas Palette
 
 | Role | Value | Usage |
 |------|-------|-------|
-| Background (dominant 100%) | `#0f172a` (slate-900) | Full-screen Canvas fill, edge-to-edge |
+| Background (dominant 60%) | `#0f172a` (slate-900) | Full-screen Canvas fill, edge-to-edge |
 | Cluster boundary fill | `rgba(148, 163, 184, 0.12)` (slate-400 at 12%) | Translucent convex hull fill for namespace clusters |
 | Namespace badge background | `rgba(15, 23, 42, 0.85)` (slate-900 at 85%) | Dark pill behind namespace label text |
 | Namespace badge text | `#ffffff` | White text on dark badge |
@@ -127,13 +134,13 @@ Accent reserved for: Pod body fill only (each level has its own color). No gener
 | Boundary fill | `rgba(148, 163, 184, 0.12)` |
 | Boundary stroke | none |
 | Label format | `{flag} ns/{CODE}` (e.g., "DE ns/DE" with flag emoji) |
-| Label position | Centered horizontally above hull top edge, 6px gap |
+| Label position | Centered horizontally above hull top edge, 8px gap |
 | Label badge background | `rgba(15, 23, 42, 0.85)` |
 | Label badge corner radius | 4px |
 | Label badge padding | 8px horizontal, 4px vertical |
 | Label badge height | 18px |
 | Label text color | `#ffffff` |
-| Label font | bold 11px system stack |
+| Label font | 600 11px system stack |
 | Single-pod cluster | Padded rectangle (60+50=110px wide, 30+50=80px tall, centered on pod) |
 | Two-pod cluster | Elongated capsule shape around both pods |
 | 3+ pod cluster | Convex hull with padding |
@@ -187,7 +194,7 @@ Accent reserved for: Pod body fill only (each level has its own color). No gener
 | Background | -- | `rgba(15, 23, 42, 0.90)` |
 | Border | -- | `1px solid #334155` |
 | Border radius | -- | 8px |
-| Padding | -- | 12px |
+| Padding | -- | 12px (`compact` token) |
 
 ---
 
@@ -203,7 +210,7 @@ Accent reserved for: Pod body fill only (each level has its own color). No gener
 | Background | `rgba(15, 23, 42, 0.80)` |
 | Border | `1px solid #334155` |
 | Border radius | 8px |
-| Padding | 8px 12px |
+| Padding | 8px 12px (vertical `sm`, horizontal `compact`) |
 | Update trigger | Recomputed on every node addition (SSE event or initial load cascade) |
 | Animation | Counter increments without transition (instant update) |
 
