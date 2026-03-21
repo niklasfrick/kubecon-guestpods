@@ -66,7 +66,7 @@ Each task was committed atomically:
 1. **Task 1: Add inter-cluster repulsion force and tune simulation parameters** - `269c3d8` (feat)
 2. **Task 2: Smooth hull corners and increase hull padding for visual clarity** - `766c5db` (feat)
 
-**Plan metadata:** (pending final commit)
+**Plan metadata:** `7431d2e` (docs: complete plan)
 
 ## Files Created/Modified
 - `web/src/viz/clusterForce.ts` - Added clusterRepulsionForce export: pairwise centroid repulsion with size-scaled minDistance
