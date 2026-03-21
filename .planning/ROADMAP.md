@@ -13,7 +13,7 @@ This roadmap delivers a live KubeCon audience participation app in four phases f
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Server Core + Submission Form** - End-to-end data pipeline: monorepo, database, API, SSE broadcaster, and mobile-friendly submission form (completed 2026-03-20)
-- [ ] **Phase 2: Visualization Engine** - Real-time K8s cluster visualization with D3 force-based namespace clustering and Canvas rendering
+- [x] **Phase 2: Visualization Engine** - Real-time K8s cluster visualization with D3 force-based namespace clustering and Canvas rendering (completed 2026-03-21)
 - [ ] **Phase 3: Admin Panel** - Presenter control surface: submission toggle, moderation, stats, and post-talk read-only mode
 - [ ] **Phase 4: Deployment + Validation** - Containerize, deploy to homelab K8s, load test at 500 concurrent users, and rehearse the live demo
 
@@ -48,9 +48,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Foundation: GET /api/submissions endpoint, D3 dependencies, TypeScript types, /viz routing, canvas scaffold
-- [ ] 02-02-PLAN.md -- Core engine: D3 force simulation, Canvas renderer, entrance animations, SSE integration, initial load cascade
-- [ ] 02-03-PLAN.md -- Overlays and performance: StatsOverlay, HoverCard with hover detection, 500-pod performance verification
+- [x] 02-01-PLAN.md -- Foundation: GET /api/submissions endpoint, D3 dependencies, TypeScript types, /viz routing, canvas scaffold
+- [x] 02-02-PLAN.md -- Core engine: D3 force simulation, Canvas renderer, entrance animations, SSE integration, initial load cascade
+- [x] 02-03-PLAN.md -- Overlays and performance: StatsOverlay, HoverCard with hover detection, 500-pod performance verification
 
 ### Phase 3: Admin Panel
 **Goal**: Presenter has a control panel to manage the guestbook during and after the live talk -- open/close submissions, moderate content, and view stats
@@ -90,6 +90,6 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
-| 2. Visualization Engine | 0/3 | Not started | - |
+| 2. Visualization Engine | 3/3 | Complete   | 2026-03-21 |
 | 3. Admin Panel | 0/? | Not started | - |
 | 4. Deployment + Validation | 0/? | Not started | - |
