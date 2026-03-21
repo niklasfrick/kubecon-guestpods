@@ -45,11 +45,12 @@ Plans:
   3. Each pod displays the attendee's name and selected emoji using K8s-themed visual language (rounded-rect shapes, status indicators)
   4. The visualization renders 500 pods without frame drops or performance degradation (Canvas rendering, profiled in DevTools)
   5. Presenter can hover over any pod to see full attendee details, and a live stats overlay shows total pod count and namespace count
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Foundation: GET /api/submissions endpoint, D3 dependencies, TypeScript types, /viz routing, canvas scaffold
+- [ ] 02-02-PLAN.md -- Core engine: D3 force simulation, Canvas renderer, entrance animations, SSE integration, initial load cascade
+- [ ] 02-03-PLAN.md -- Overlays and performance: StatsOverlay, HoverCard with hover detection, 500-pod performance verification
 
 ### Phase 3: Admin Panel
 **Goal**: Presenter has a control panel to manage the guestbook during and after the live talk -- open/close submissions, moderate content, and view stats
@@ -89,6 +90,6 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
-| 2. Visualization Engine | 0/? | Not started | - |
+| 2. Visualization Engine | 0/3 | Not started | - |
 | 3. Admin Panel | 0/? | Not started | - |
 | 4. Deployment + Validation | 0/? | Not started | - |
