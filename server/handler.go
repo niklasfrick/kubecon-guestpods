@@ -93,6 +93,20 @@ func (h *Handler) HandleQRCode() http.HandlerFunc {
 	}
 }
 
+// HandleGetSubmissions returns an http.HandlerFunc for GET /api/submissions.
+// It returns all non-deleted submissions as a JSON array.
+func (h *Handler) HandleGetSubmissions() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		submissions, err := h.store.GetAll()
+		if err != nil {
+			log.Printf("ERROR: get submissions: %v", err)
+			writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Failed to load submissions"})
+			return
+		}
+		writeJSON(w, http.StatusOK, submissions)
+	}
+}
+
 // HandleHealth returns an http.HandlerFunc for GET /api/health.
 func (h *Handler) HandleHealth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

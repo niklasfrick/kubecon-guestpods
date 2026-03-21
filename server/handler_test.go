@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -211,6 +212,71 @@ func TestHealth(t *testing.T) {
 	}
 	if !strings.Contains(rr.Body.String(), "ok") {
 		t.Errorf("expected body to contain 'ok', got: %s", rr.Body.String())
+	}
+}
+
+func TestHandleGetSubmissions_Empty(t *testing.T) {
+	h, cleanup := setupTestHandler(t)
+	defer cleanup()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/submissions", nil)
+	rr := httptest.NewRecorder()
+
+	h.HandleGetSubmissions().ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	var resp []SubmitResponse
+	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(resp) != 0 {
+		t.Errorf("expected 0 submissions, got %d", len(resp))
+	}
+}
+
+func TestHandleGetSubmissions_WithData(t *testing.T) {
+	h, cleanup := setupTestHandler(t)
+	defer cleanup()
+
+	// Insert test submissions
+	for _, name := range []string{"Alice", "Bob", "Charlie"} {
+		body := fmt.Sprintf(`{"name":"%s","country_code":"DE","homelab_level":3}`, name)
+		submitReq := httptest.NewRequest(http.MethodPost, "/api/submissions", strings.NewReader(body))
+		submitReq.Header.Set("Content-Type", "application/json")
+		submitRR := httptest.NewRecorder()
+		h.HandleSubmit().ServeHTTP(submitRR, submitReq)
+		if submitRR.Code != http.StatusCreated {
+			t.Fatalf("failed to insert %s: status %d", name, submitRR.Code)
+		}
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/api/submissions", nil)
+	rr := httptest.NewRecorder()
+
+	h.HandleGetSubmissions().ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	var resp []SubmitResponse
+	if err := json.NewDecoder(rr.Body).Decode(&resp); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(resp) != 3 {
+		t.Fatalf("expected 3 submissions, got %d", len(resp))
+	}
+	if resp[0].Name != "Alice" {
+		t.Errorf("expected first submission Alice, got %s", resp[0].Name)
+	}
+	if resp[0].CountryFlag == "" {
+		t.Error("expected non-empty CountryFlag")
+	}
+	if resp[0].HomelabEmoji == "" {
+		t.Error("expected non-empty HomelabEmoji")
 	}
 }
 

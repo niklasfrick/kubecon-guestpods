@@ -31,6 +31,7 @@ func main() {
 	// API routes (Go 1.22+ method patterns)
 	mux.HandleFunc("POST /api/submissions", handler.HandleSubmit())
 	mux.HandleFunc("GET /api/submissions/stream", hub.HandleSSE())
+	mux.HandleFunc("GET /api/submissions", handler.HandleGetSubmissions())
 	mux.HandleFunc("GET /api/qr", handler.HandleQRCode())
 	mux.HandleFunc("GET /api/health", handler.HandleHealth())
 
