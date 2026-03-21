@@ -8,7 +8,7 @@ import {
 
 const ANIM_DURATION = 600;   // ms for scale-up animation
 const GLOW_DURATION = 2000;  // ms for glow fade-out
-const HULL_PADDING = 25;     // px padding around nodes for hull computation
+const HULL_PADDING = 35;     // px padding around nodes for hull computation
 
 /** Truncate a string to maxLen rune-aware characters, appending ".." if truncated. */
 function truncate(s: string, maxLen: number): string {
@@ -156,13 +156,26 @@ function drawClusterBoundary(ctx: CanvasRenderingContext2D, cluster: ClusterData
   }
 
   const hull = polygonHull(points);
-  if (!hull) return;
+  if (!hull || hull.length < 3) return;
 
+  // Smooth hull with rounded corners using quadratic curves
   ctx.beginPath();
-  ctx.moveTo(hull[0][0], hull[0][1]);
+  // Start at midpoint of first edge
+  const first = hull[0];
+  const second = hull[1];
+  ctx.moveTo((first[0] + second[0]) / 2, (first[1] + second[1]) / 2);
+
   for (let i = 1; i < hull.length; i++) {
-    ctx.lineTo(hull[i][0], hull[i][1]);
+    const curr = hull[i];
+    const next = hull[(i + 1) % hull.length];
+    const midX = (curr[0] + next[0]) / 2;
+    const midY = (curr[1] + next[1]) / 2;
+    ctx.quadraticCurveTo(curr[0], curr[1], midX, midY);
   }
+  // Close back to start
+  const last = hull[0];
+  const afterLast = hull[1];
+  ctx.quadraticCurveTo(last[0], last[1], (last[0] + afterLast[0]) / 2, (last[1] + afterLast[1]) / 2);
   ctx.closePath();
   ctx.fill();
 }
