@@ -13,8 +13,8 @@ This roadmap delivers a live KubeCon audience participation app in four phases f
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Server Core + Submission Form** - End-to-end data pipeline: monorepo, database, API, SSE broadcaster, and mobile-friendly submission form (completed 2026-03-20)
-- [ ] **Phase 2: Visualization Engine** - Real-time K8s cluster visualization with D3 force-based namespace clustering and Canvas rendering (gap closure in progress)
-- [ ] **Phase 3: Admin Panel** - Presenter control surface: submission toggle, moderation, stats, and post-talk read-only mode
+- [x] **Phase 2: Visualization Engine** - Real-time K8s cluster visualization with D3 force-based namespace clustering and Canvas rendering (completed 2026-03-22)
+- [x] **Phase 3: Admin Panel** - Presenter control surface: submission toggle, moderation, stats, and post-talk read-only mode (completed 2026-03-22)
 - [ ] **Phase 4: Deployment + Validation** - Containerize, deploy to homelab K8s, load test at 500 concurrent users, and rehearse the live demo
 
 ## Phase Details
@@ -51,8 +51,8 @@ Plans:
 - [x] 02-01-PLAN.md -- Foundation: GET /api/submissions endpoint, D3 dependencies, TypeScript types, /viz routing, canvas scaffold
 - [x] 02-02-PLAN.md -- Core engine: D3 force simulation, Canvas renderer, entrance animations, SSE integration, initial load cascade
 - [x] 02-03-PLAN.md -- Overlays and performance: StatsOverlay, HoverCard with hover detection, 500-pod performance verification
-- [ ] 02-04-PLAN.md -- Gap closure: Fix cluster overlap with inter-cluster repulsion force and tuned simulation parameters
-- [ ] 02-05-PLAN.md -- Gap closure: Add pan/zoom navigation for large visualizations
+- [x] 02-04-PLAN.md -- Gap closure: Fix cluster overlap with inter-cluster repulsion force and tuned simulation parameters
+- [x] 02-05-PLAN.md -- Gap closure: Add pan/zoom navigation for large visualizations
 
 ### Phase 3: Admin Panel
 **Goal**: Presenter has a control panel to manage the guestbook during and after the live talk -- open/close submissions, moderate content, and view stats
@@ -67,8 +67,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Go backend: auth (session cookies), admin state (toggle + config table), store extensions (delete, stats), SSE event types, admin API endpoints, tests
-- [ ] 03-02-PLAN.md -- Preact frontend: login form, dashboard (toggle, stats, pod list with delete), SSE client extension, viz deletion integration, end-to-end verification
+- [x] 03-01-PLAN.md -- Go backend: auth (session cookies), admin state (toggle + config table), store extensions (delete, stats), SSE event types, admin API endpoints, tests
+- [x] 03-02-PLAN.md -- Preact frontend: login form, dashboard (toggle, stats, pod list with delete), SSE client extension, viz deletion integration, end-to-end verification
 
 ### Phase 4: Deployment + Validation
 **Goal**: Application runs reliably on the homelab Kubernetes cluster and has been validated under production load conditions identical to the live talk scenario
@@ -93,6 +93,6 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
-| 2. Visualization Engine | 3/5 | Gap closure | - |
-| 3. Admin Panel | 0/2 | Planning complete | - |
+| 2. Visualization Engine | 5/5 | Complete | 2026-03-22 |
+| 3. Admin Panel | 2/2 | Complete | 2026-03-22 |
 | 4. Deployment + Validation | 0/? | Not started | - |
