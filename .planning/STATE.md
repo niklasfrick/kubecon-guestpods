@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-22T19:27:45.413Z"
-last_activity: 2026-03-22 -- Completed Plan 03-02 (Admin Frontend)
+status: executing
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-22T20:00:45.301Z"
+last_activity: 2026-03-22 -- Completed Plan 04-02 (Helm Chart)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_plans: 12
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** Attendees see themselves appear in real-time as pods in a K8s cluster visualization, creating a shared interactive moment during the talk.
-**Current focus:** Phase 3 complete -- Admin panel fully functional. Phase 4 (Deployment) next.
+**Current focus:** Phase 4 in progress -- Helm chart complete, CI/CD and load testing next.
 
 ## Current Position
 
 Phase: 4 of 4 (Deployment + Validation)
-Plan: 0 of ? in current phase
-Status: Phase 3 complete, Phase 4 next
-Last activity: 2026-03-22 -- Completed Plan 03-02 (Admin Frontend)
+Plan: 2 of 3 in current phase
+Status: Executing Phase 4
+Last activity: 2026-03-22 -- Completed Plan 04-02 (Helm Chart)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100%
 | Phase 03 P01 | 6 min | 2 tasks | 12 files |
 | Phase 03 P01 | 6 | 2 tasks | 12 files |
 | Phase 03 P02 | 25 | 3 tasks | 17 files |
+| Phase 04 P02 | 2 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 03-02]: Existing submissions render instantly without animation; only new SSE arrivals animate in
 - [Phase 03-02]: Delete-all admin feature for bulk moderation during live talk
 - [Phase 03-02]: SPA fallback changed from GET / to / (all methods) to resolve Go 1.26 route pattern conflict
+- [Phase 04-02]: existingSecret pattern for admin password -- chart references external Secret
+- [Phase 04-02]: Recreate deployment strategy for SQLite single-writer constraint
+- [Phase 04-02]: cert-manager Certificate resource (conditional on tls.enabled) for origin TLS between Cloudflare and cluster
 
 ### Pending Todos
 
@@ -112,6 +116,6 @@ None active.
 
 ## Session Continuity
 
-Last session: 2026-03-22T19:27:45.411Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-deployment-validation/04-CONTEXT.md
+Last session: 2026-03-22T20:00:45.299Z
+Stopped at: Completed 04-02-PLAN.md
+Resume file: None
