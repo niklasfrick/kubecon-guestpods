@@ -4,7 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 )
+
+// SSEKeepAliveInterval controls how often keep-alive comments are sent.
+// Set to 30s for production (prevents Cloudflare ~100s idle timeout).
+// Tests override this to a shorter interval for fast execution.
+var SSEKeepAliveInterval = 30 * time.Second
 
 // SSEHub manages SSE client subscriptions and broadcasts events to all connected clients.
 type SSEHub struct {
@@ -83,10 +89,17 @@ func (h *SSEHub) HandleSSE() http.HandlerFunc {
 		ch := h.Subscribe()
 		defer h.Unsubscribe(ch)
 
+		ticker := time.NewTicker(SSEKeepAliveInterval)
+		defer ticker.Stop()
+
 		for {
 			select {
 			case <-r.Context().Done():
 				return
+			case <-ticker.C:
+				// SSE comment keeps Cloudflare proxy connection alive
+				w.Write([]byte(": keepalive\n\n"))
+				flusher.Flush()
 			case data := <-ch:
 				// data is already pre-formatted SSE text from BroadcastEvent
 				w.Write(data)

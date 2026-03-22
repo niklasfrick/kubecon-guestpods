@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/niklas/kubecon-guestbook/server"
 )
@@ -83,8 +87,20 @@ func main() {
 	// Apply middleware: CORS -> Logging -> mux
 	wrapped := server.LoggingMiddleware(server.CORSMiddleware(mux))
 
+	srv := &http.Server{Addr: *addr, Handler: wrapped}
+
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGTERM, syscall.SIGINT)
+		<-sigCh
+		log.Println("Shutting down gracefully...")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		srv.Shutdown(ctx)
+	}()
+
 	log.Printf("Server listening on %s", *addr)
-	if err := http.ListenAndServe(*addr, wrapped); err != nil {
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatalf("Server failed: %v", err)
 	}
 }
