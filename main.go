@@ -41,6 +41,7 @@ func main() {
 	mux.HandleFunc("GET /api/submissions/stream", hub.HandleSSE())
 	mux.HandleFunc("GET /api/submissions", handler.HandleGetSubmissions())
 	mux.HandleFunc("GET /api/qr", handler.HandleQRCode())
+	mux.HandleFunc("GET /api/status", handler.HandlePublicStatus())
 	mux.HandleFunc("GET /api/health", handler.HandleHealth())
 
 	// Admin login (unprotected -- must be accessible without a session)
@@ -50,6 +51,7 @@ func main() {
 	adminMux := http.NewServeMux()
 	adminMux.HandleFunc("POST /api/admin/toggle", handler.HandleToggle())
 	adminMux.HandleFunc("DELETE /api/admin/submissions/{id}", handler.HandleDelete())
+	adminMux.HandleFunc("DELETE /api/admin/submissions", handler.HandleDeleteAll())
 	adminMux.HandleFunc("GET /api/admin/stats", handler.HandleStats())
 	adminMux.HandleFunc("GET /api/admin/status", handler.HandleStatus())
 	mux.Handle("/api/admin/", server.AuthMiddleware(sessions, adminMux))

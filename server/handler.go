@@ -156,6 +156,13 @@ func (h *Handler) HandleGetSubmissions() http.HandlerFunc {
 	}
 }
 
+// HandlePublicStatus returns submission status (public, no auth required).
+func (h *Handler) HandlePublicStatus() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]bool{"submissions_open": h.adminState.IsOpen()})
+	}
+}
+
 // HandleHealth returns an http.HandlerFunc for GET /api/health.
 func (h *Handler) HandleHealth() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

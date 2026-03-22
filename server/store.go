@@ -177,6 +177,16 @@ func (s *Store) GetStats() (*AdminStats, error) {
 	}, nil
 }
 
+// DeleteAll soft-deletes all submissions. Returns the count of affected rows.
+func (s *Store) DeleteAll() (int64, error) {
+	result, err := s.db.Exec("UPDATE submissions SET deleted = TRUE WHERE deleted = FALSE")
+	if err != nil {
+		return 0, fmt.Errorf("soft-delete all submissions: %w", err)
+	}
+	rows, _ := result.RowsAffected()
+	return rows, nil
+}
+
 // GetConfig retrieves a config value by key. Returns empty string if key not set.
 func (s *Store) GetConfig(key string) (string, error) {
 	var value string

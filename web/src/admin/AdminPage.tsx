@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import { signal } from '@preact/signals';
 import type { SubmitResponse } from '../api';
 import { fetchSubmissions } from '../api';
-import { checkSession, getStats, deleteSubmission } from './adminApi';
+import { checkSession, getStats, deleteSubmission, deleteAllSubmissions } from './adminApi';
 import type { AdminStats } from './adminApi';
 import { LoginForm } from './LoginForm';
 import { ToggleButton } from './ToggleButton';
@@ -117,6 +117,11 @@ export function AdminPage() {
       }
     });
 
+    es.addEventListener('clear', () => {
+      pods.value = [];
+      recomputeStats([]);
+    });
+
     es.addEventListener('state', (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
@@ -167,6 +172,21 @@ export function AdminPage() {
     }
   }
 
+  async function handleDeleteAll() {
+    if (!window.confirm('Delete ALL submissions? This cannot be undone.')) return;
+    const previous = pods.value;
+    pods.value = [];
+    recomputeStats([]);
+    try {
+      await deleteAllSubmissions();
+    } catch {
+      pods.value = previous;
+      recomputeStats(previous);
+      errorBanner.value = 'Failed to delete all submissions.';
+      setTimeout(() => { errorBanner.value = null; }, 5000);
+    }
+  }
+
   if (authState.value === 'checking') {
     return <div class="admin-checking">Checking session...</div>;
   }
@@ -196,6 +216,15 @@ export function AdminPage() {
         namespaceCount={namespaceCount.value}
         topLocations={topLocations.value}
       />
+
+      {pods.value.length > 0 && (
+        <button
+          class="admin-delete-all"
+          onClick={handleDeleteAll}
+        >
+          Delete All Submissions ({pods.value.length})
+        </button>
+      )}
 
       <PodList pods={pods.value} onDelete={handleDelete} />
     </div>

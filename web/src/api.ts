@@ -28,12 +28,6 @@ export async function submitEntry(
     body: JSON.stringify(data),
   });
 
-  if (res.status === 403) {
-    // Submissions closed -- redirect to visualization
-    window.location.href = "/viz";
-    throw new Error("Submissions closed");
-  }
-
   const body = await res.json();
 
   if (!res.ok) {

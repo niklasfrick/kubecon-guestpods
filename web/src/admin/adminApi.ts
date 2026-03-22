@@ -40,6 +40,15 @@ export async function deleteSubmission(id: number): Promise<void> {
   if (!res.ok) throw new Error('Delete failed');
 }
 
+export async function deleteAllSubmissions(): Promise<{ deleted: number }> {
+  const res = await fetch('/api/admin/submissions', {
+    method: 'DELETE',
+    credentials: 'same-origin',
+  });
+  if (!res.ok) throw new Error('Delete all failed');
+  return res.json();
+}
+
 export interface AdminStats {
   total_pods: number;
   namespace_count: number;

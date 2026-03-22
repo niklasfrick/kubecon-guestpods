@@ -14,6 +14,7 @@ export function connectSSE(
   onSubmission: (data: SubmitResponse) => void,
   onDeletion?: (data: { id: number }) => void,
   onState?: (data: { submissions_open: boolean }) => void,
+  onClear?: () => void,
 ): () => void {
   const es = new EventSource('/api/submissions/stream');
 
@@ -45,6 +46,12 @@ export function connectSSE(
       } catch (e) {
         console.error('Failed to parse SSE state:', e);
       }
+    });
+  }
+
+  if (onClear) {
+    es.addEventListener('clear', () => {
+      onClear();
     });
   }
 

@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { submitEntry, SubmissionError } from "../api";
-import { formState, submissionData } from "../app";
+import { formState, submissionData, appView } from "../app";
 import { TextInput } from "./TextInput";
 import { CountrySelect } from "./CountrySelect";
 import { HomelabScale } from "./HomelabScale";
@@ -61,11 +61,16 @@ export function SubmissionForm() {
 
       submissionData.value = response;
       localStorage.setItem("guestbook_submission", JSON.stringify(response));
-      formState.value = "success";
+      appView.value = 'viz';
     } catch (err) {
       formState.value = "form";
 
       if (err instanceof SubmissionError) {
+        if (err.status === 403) {
+          // Submissions closed while form was open — switch to viz
+          appView.value = 'viz';
+          return;
+        }
         if (err.status === 422) {
           // Profanity rejection
           setFieldErrors({

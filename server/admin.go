@@ -82,6 +82,24 @@ func (h *Handler) HandleDelete() http.HandlerFunc {
 	}
 }
 
+// HandleDeleteAll returns a handler for DELETE /api/admin/submissions.
+// Soft-deletes all submissions and broadcasts a clear event via SSE.
+func (h *Handler) HandleDeleteAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		count, err := h.store.DeleteAll()
+		if err != nil {
+			log.Printf("ERROR: delete all submissions: %v", err)
+			writeJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Failed to delete all submissions"})
+			return
+		}
+
+		// Broadcast clear event so viz and admin remove all nodes
+		h.hub.BroadcastEvent(SSEEvent{Type: "clear", Data: []byte("{}")})
+
+		writeJSON(w, http.StatusOK, map[string]int64{"deleted": count})
+	}
+}
+
 // HandleStats returns a handler for GET /api/admin/stats.
 func (h *Handler) HandleStats() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

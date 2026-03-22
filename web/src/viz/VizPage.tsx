@@ -180,14 +180,16 @@ export function VizPage() {
           // Pre-compute layout (200 ticks, synchronous)
           precomputeLayout(sim, allNodes);
 
-          // Cascade the visual entrance
-          queue.enqueue([...allNodes]);
+          // Show existing nodes instantly (no entrance animation)
+          const now = performance.now();
+          for (const node of allNodes) {
+            node.animProgress = 1;
+            node.glowOpacity = 0;
+            node.animStartTime = now;
+          }
 
-          // After cascade, switch to SSE stagger speed
-          const cascadeTime = allNodes.length * 50 + 500;
-          setTimeout(() => {
-            queue.staggerMs = 200;
-          }, cascadeTime);
+          // SSE stagger speed for new arrivals only
+          queue.staggerMs = 200;
         }
       } catch (e) {
         console.error('Failed to load submissions:', e);
@@ -197,7 +199,7 @@ export function VizPage() {
       // Start render loop
       animFrameId = requestAnimationFrame(render);
 
-      // Connect SSE for real-time updates (submission + deletion events)
+      // Connect SSE for real-time updates (submission, deletion, clear events)
       const closeSSE = connectSSE(
         // onSubmission
         (data: SubmitResponse) => {
@@ -213,13 +215,21 @@ export function VizPage() {
           if (idx !== -1) {
             allNodes = allNodes.filter(n => n.id !== data.id);
             sim.nodes(allNodes);
-            sim.alpha(0.1).restart(); // Gentle reheat to fill the gap
+            sim.alpha(0.1).restart();
 
-            // Clear hover if the deleted node was hovered
             if (hoveredPod.value && hoveredPod.value.id === data.id) {
               hoveredPod.value = null;
             }
           }
+        },
+        // onState
+        undefined,
+        // onClear
+        () => {
+          allNodes = [];
+          sim.nodes(allNodes);
+          sim.alpha(0).stop();
+          hoveredPod.value = null;
         }
       );
 
