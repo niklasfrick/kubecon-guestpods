@@ -1,12 +1,19 @@
 ---
 phase: 02-visualization-engine
-verified: 2026-03-21T22:30:00Z
-status: gaps_found
-score: 13/13 must-haves verified (2 UX gaps reported by human)
-re_verification: false
+verified: 2026-03-21T23:45:00Z
+status: human_needed
+score: 15/15 must-haves verified
+re_verification: true
+  previous_status: gaps_found
+  previous_score: 13/13 (2 UX gaps reported by human)
+  gaps_closed:
+    - "Namespace clusters overlapping each other (VIZZ-02, VIZZ-03, VIZZ-07)"
+    - "No pan/zoom navigation for large visualizations (VIZZ-10)"
+  gaps_remaining: []
+  regressions: []
 human_verification:
-  - test: "Open /viz in browser with at least one prior submission and confirm pods render"
-    expected: "Colored rounded-rect pods appear on dark canvas (#0f172a), grouped by country with convex-hull boundaries and ns/CODE labels"
+  - test: "Open /viz in browser with at least one prior submission and confirm pods render with separated clusters"
+    expected: "Colored rounded-rect pods appear on dark canvas (#0f172a), grouped by country with smooth convex-hull boundaries and ns/CODE labels. Clusters have visible gaps between them — no hull overlap."
     why_human: "Canvas 2D rendering cannot be verified programmatically; requires visual confirmation"
   - test: "Submit a new entry on the form, switch to /viz tab, confirm pod appears within 2 seconds with glow animation"
     expected: "Pod animates in with scale-up (easeBackOut) and shadowBlur glow that fades over 2 seconds"
@@ -17,17 +24,40 @@ human_verification:
   - test: "Hover over a pod and confirm HoverCard appears with correct details"
     expected: "Card shows emoji + full name, flag + ns/CODE (mono font), homelab level description. NO timestamp. Cursor changes to pointer."
     why_human: "Hover hit-testing behavior and card content layout require manual interaction"
-  - test: "Load 500 pods via the performance test script from plan 03 and check frame rate"
-    expected: "Frame rate stays above 30fps (ideally 60fps) with 500 pods rendered"
+  - test: "Load 500 pods via performance test script and check frame rate"
+    expected: "Frame rate stays above 30fps (ideally 60fps) with 500 pods rendered and force simulation running"
     why_human: "Performance under 500 pods requires DevTools Performance tab measurement; cannot be verified statically"
+  - test: "Scroll the mouse wheel on /viz to zoom in and out"
+    expected: "View zooms toward the cursor position. Zoom range 0.1x to 5x. Pods, hulls, and labels all scale with the zoom."
+    why_human: "Canvas transform pipeline and zoom center correctness require live browser interaction"
+  - test: "Click and drag on /viz to pan the view"
+    expected: "Canvas pans with the drag. Cursor changes to grabbing. Dragging beyond the canvas edge continues to pan smoothly."
+    why_human: "Pan behavior and cursor state require manual interaction"
+  - test: "Hover over a pod after panning and zooming"
+    expected: "HoverCard appears correctly near the pod at its screen position regardless of the current pan/zoom state"
+    why_human: "Screen-to-world coordinate conversion correctness can only be confirmed interactively"
+  - test: "Load /viz with submissions from 5+ countries and observe initial view"
+    expected: "Initial view auto-fits to show all clusters within the viewport. No clusters are clipped at the edges."
+    why_human: "Auto-fit bounding box behavior requires visual confirmation with real data spread across multiple clusters"
 ---
 
 # Phase 2: Visualization Engine Verification Report
 
-**Phase Goal:** Real-time Canvas visualization with D3 force-directed pod layout, namespace clustering, entrance animations, and SSE live updates
-**Verified:** 2026-03-21T22:30:00Z
+**Phase Goal:** New submissions appear as animated pods in a full-screen K8s cluster visualization, grouped into namespace clusters by location, suitable for a 1920x1080 projector
+**Verified:** 2026-03-21T23:45:00Z
 **Status:** human_needed
-**Re-verification:** No — initial verification
+**Re-verification:** Yes — after gap closure (plans 02-04 and 02-05)
+
+## Re-verification Context
+
+Previous verification (2026-03-21T22:30:00Z) reported `gaps_found` with two UX gaps identified during human testing:
+
+1. **Gap 1 (VIZZ-02/03/07):** Namespace clusters overlapped each other, making labels unreadable. Fixed in plan 02-04 by adding `clusterRepulsionForce` and tuning simulation parameters.
+2. **Gap 2 (VIZZ-10):** No pan/zoom navigation, making large visualizations impossible to navigate. Fixed in plan 02-05 by adding scroll-to-zoom and drag-to-pan with auto-fit initial view.
+
+This re-verification confirms both gap closures are implemented correctly in the codebase.
+
+---
 
 ## Goal Achievement
 
@@ -35,91 +65,113 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | GET /api/submissions returns all non-deleted submissions as JSON array | VERIFIED | `server/handler.go:98` `HandleGetSubmissions` queries `store.GetAll()` and writes JSON; `go test ./server/ -run TestHandleGetSubmissions` passes 2 tests |
+| 1 | GET /api/submissions returns all non-deleted submissions as JSON array | VERIFIED | `server/handler.go:98` `HandleGetSubmissions` queries `store.GetAll()` and writes JSON |
 | 2 | Navigating to /viz renders VizPage instead of submission form | VERIFIED | `web/src/app.tsx:25` — `if (window.location.pathname === '/viz') { return <VizPage />; }` |
-| 3 | PodNode type extends SimulationNodeDatum with all required fields | VERIFIED | `web/src/viz/types.ts:5-23` — exports `PodNode` with id, name, countryCode, countryFlag, homelabLevel, homelabEmoji, clusterId, animProgress, animStartTime, glowOpacity |
-| 4 | LEVEL_COLORS map has 5 distinct hex values matching UI-SPEC | VERIFIED | `web/src/viz/colors.ts:2-8` — keys 1-5 with `#60a5fa`, `#fb7185`, `#fbbf24`, `#2dd4bf`, `#a78bfa` |
-| 5 | Existing submissions load from API and appear as colored pods grouped by country | VERIFIED | `VizPage.tsx:104-113` calls `fetchSubmissions()`, maps to PodNodes, calls `precomputeLayout` (120 ticks), then `queue.enqueue`; `renderer.ts` draws colored rounded-rects via `LEVEL_COLORS` |
-| 6 | New SSE submissions appear within 1-2 seconds with scale-up + glow entrance animation | VERIFIED (code) | `sseClient.ts` listens on `EventSource('/api/submissions/stream')` for 'submission' event; `VizPage.tsx:130-135` adds node and calls `queue.enqueue`; `renderer.ts:76-86` applies `easeBackOut` scale + `ctx.shadowBlur`; needs human timing check |
-| 7 | Pods grouped into namespace clusters with convex hull boundaries and K8s-style labels | VERIFIED (code) | `renderer.ts:531-590` — 3-case boundary: padded rect (1 node), capsule (2 nodes), convex hull (3+) via `polygonHull`; `drawNamespaceLabel` renders `ns/${cluster.countryCode}` badge; needs visual check |
-| 8 | D3 force simulation arranges pods organically without overlap | VERIFIED | `simulation.ts:32-43` — `forceSimulation` with `forceManyBody(-30)`, `forceCollide(35)`, `forceCenter`, `clusterForce(0.15)`, `forceX`, `forceY`; manual tick in render loop |
-| 9 | Stats overlay shows live pod count and namespace count | VERIFIED (code) | `StatsOverlay.tsx` renders `class="stats-overlay"` with `{podCount.value} pods · {nsCount.value} namespaces`; `style.css:340-344` positions it `fixed; top:16px; left:16px`; needs visual check |
-| 10 | Hovering over a pod shows expanded card with full name, namespace label, homelab level description | VERIFIED (code) | `VizPage.tsx:154` uses `sim.find(x, y, 20)` for hit testing; `HoverCard.tsx` renders emoji+name, flag+ns/CODE, `HOMELAB_DESCRIPTIONS[level]`; no timestamp present; needs human interaction check |
-| 11 | TypeScript compiles clean | VERIFIED | `npx tsc --noEmit` exits 0 (no output) |
-| 12 | Vite build succeeds | VERIFIED | `npm run build` — 80 modules, 57.38 kB JS, exits 0 |
-| 13 | 500 pods render without frame drops | NEEDS HUMAN | Human checkpoint in plan 03 was approved; programmatic static analysis cannot verify frame rate |
+| 3 | Existing submissions load from API and appear as colored pods grouped by country | VERIFIED | `VizPage.tsx:114` calls `fetchSubmissions()`, maps to PodNodes, calls `precomputeLayout` (200 ticks), then `queue.enqueue` |
+| 4 | New SSE submissions appear within 1-2 seconds with scale-up + glow entrance animation | VERIFIED (code) | `sseClient.ts` EventSource on `'submission'` event; `renderer.ts:76-86` applies `easeBackOut` scale + `shadowBlur` glow; needs human timing check |
+| 5 | Pods grouped into namespace clusters with smooth hull boundaries and K8s-style labels | VERIFIED (code) | `renderer.ts:149-181` — 3-case boundary: padded rect, capsule, quadratic-curve smooth convex hull; `drawNamespaceLabel` renders `ns/${cluster.countryCode}` badge; needs visual check |
+| 6 | Namespace clusters are visually separated with clear gaps — no overlapping hulls or labels | VERIFIED (code) | `clusterForce.ts:57-116` exports `clusterRepulsionForce` — pairwise centroid repulsion with size-scaled `minDistance`; `simulation.ts:37` registers `.force('clusterRepulsion', clusterRepulsionForce(0.8, 150))`; needs visual confirmation |
+| 7 | D3 force simulation arranges pods organically without overlap, layout settles within seconds | VERIFIED | `simulation.ts:33-42` — 7 forces: charge(-50), collide(40, 3 iter), center(0.02), cluster(0.15), clusterRepulsion(0.8, 150), x(0.01), y(0.01); 200 precompute ticks |
+| 8 | Stats overlay shows live pod count and namespace count | VERIFIED (code) | `StatsOverlay.tsx` renders `class="stats-overlay"` with `{podCount.value} pods · {nsCount.value} namespaces`; `style.css:340-344` positions it `fixed; top:16px; left:16px`; needs visual check |
+| 9 | Hovering over a pod shows expanded card with full name, namespace label, homelab level description | VERIFIED (code) | `VizPage.tsx:244` uses `sim.find(worldX, worldY, 20 / viewTransform.k)` for hit testing with transform-aware radius; `HoverCard.tsx` renders emoji+name, flag+ns/CODE, `HOMELAB_DESCRIPTIONS[level]`; needs human interaction check |
+| 10 | User can scroll to zoom in/out of the visualization | VERIFIED | `VizPage.tsx:184-199` — `onWheel` handler with `e.preventDefault()`, zoom factor 0.9/1.1, clamped 0.1-5x, fixed-point mouse-cursor zoom math |
+| 11 | User can click-drag to pan the visualization | VERIFIED | `VizPage.tsx:201-224` — `onMouseDown` sets `isPanning=true`, `onMouseMoveGlobal` updates `viewTransform.x/y`; `window.addEventListener` so pan continues beyond canvas edge |
+| 12 | Pan/zoom transform applies to all canvas drawing (pods, hulls, labels) | VERIFIED | `renderer.ts:238-242` — `ctx.save(); ctx.translate(transform.x, transform.y); ctx.scale(transform.k, transform.k)` wraps all world-space drawing; background fill is before transform |
+| 13 | Hover detection accounts for current pan/zoom transform | VERIFIED | `VizPage.tsx:242-244` — screen→world conversion: `worldX = (x - viewTransform.x) / viewTransform.k`; search radius `20 / viewTransform.k` |
+| 14 | HoverCard position accounts for current transform | VERIFIED | `VizPage.tsx:253-255` — world→screen conversion: `screenX = found.x! * viewTransform.k + viewTransform.x` |
+| 15 | Initial view auto-fits all clusters with padding | VERIFIED | `VizPage.tsx:123-143` — bounding box computation, `fitScale = Math.min(scaleX, scaleY, 1)`, sets `viewTransform.k/x/y` |
 
-**Score:** 13/13 truths pass code-level verification; 5 require human visual/runtime confirmation (status: human_needed)
+**Score:** 15/15 truths pass code-level verification; 9 require human visual/runtime confirmation
 
 ### Required Artifacts
 
+#### Gap 1 Closure (cluster separation — plan 02-04)
+
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `server/handler.go` | `HandleGetSubmissions` HTTP handler | VERIFIED | Line 98 — full implementation querying `store.GetAll()`, returns JSON array |
-| `server/handler_test.go` | Tests for GET /api/submissions | VERIFIED | `TestHandleGetSubmissions_Empty` (line 218) and `TestHandleGetSubmissions_WithData` (line 240) — both PASS |
-| `main.go` | Route registration for GET /api/submissions | VERIFIED | Line 34 — `mux.HandleFunc("GET /api/submissions", handler.HandleGetSubmissions())` |
-| `web/src/viz/types.ts` | PodNode and ClusterData type definitions | VERIFIED | Exports both interfaces; PodNode extends SimulationNodeDatum |
-| `web/src/viz/colors.ts` | LEVEL_COLORS and HOMELAB_DESCRIPTIONS | VERIFIED | Both exported; all 5 homelab levels; BG_COLOR, CLUSTER_FILL, BADGE_BG, FONT_STACK, POD_WIDTH/HEIGHT/RADIUS |
-| `web/src/viz/VizPage.tsx` | Complete visualization page | VERIFIED | Imports all dependencies, full implementation: simulation, render loop, SSE, initial load, hover detection, overlay rendering |
-| `web/src/api.ts` | `fetchSubmissions()` function | VERIFIED | Lines 47-54 — `export async function fetchSubmissions(): Promise<SubmitResponse[]>` with fetch to `/api/submissions` |
-| `web/src/viz/clusterForce.ts` | Custom D3 force for cluster attraction | VERIFIED | Exports `clusterForce`; computes centroids, pulls nodes with configurable strength; `force.initialize` method present |
-| `web/src/viz/simulation.ts` | D3 force simulation setup | VERIFIED | Exports `createSimulation`, `addNodes`, `toPodNode`, `precomputeLayout`, `updateCenter`; 120-tick pre-computation loop |
-| `web/src/viz/renderer.ts` | Canvas 2D drawing functions | VERIFIED | Exports `drawFrame`, `updateAnimations`, `computeStats`; imports `polygonHull`, `easeBackOut`; 3-case cluster boundary logic |
-| `web/src/viz/animationQueue.ts` | Staggered entrance animation queue | VERIFIED | Exports `AnimationQueue` class; `enqueue`, `destroy`, `staggerMs`, `onActivate` all present; sets `animStartTime`, `glowOpacity = 1` on activation |
-| `web/src/viz/sseClient.ts` | EventSource SSE client | VERIFIED | Exports `connectSSE`; creates `new EventSource('/api/submissions/stream')`; listens on `'submission'` event; returns `() => es.close()` cleanup |
-| `web/src/viz/StatsOverlay.tsx` | DOM overlay for live stats | VERIFIED | Exports `StatsOverlay`; renders `class="stats-overlay"` with `podCount.value` and `nsCount.value`; U+00B7 separator |
-| `web/src/viz/HoverCard.tsx` | DOM overlay for pod hover details | VERIFIED | Exports `HoverCard`, `hoveredPod`, `hoverPos` signals; renders name, namespace (flag + ns/CODE), level description; no timestamp; viewport-edge flip logic |
-| `web/src/style.css` | CSS for visualization overlays | VERIFIED | `.stats-overlay` at lines 340-357 (fixed, top:16px, left:16px); `.hover-card` at line 364 (fixed, max-width:220px, background rgba(15,23,42,0.90)); `.hover-card-namespace` with `font-family: var(--font-mono)` |
+| `web/src/viz/clusterForce.ts` | `clusterRepulsionForce` export with pairwise centroid repulsion | VERIFIED | Lines 57-116: exported function with `strength=0.8`, `minDistance=150`, size-scaled effective minimum, pairwise O(k²) loop, `force.initialize` method |
+| `web/src/viz/simulation.ts` | Import and register `clusterRepulsionForce` force, tuned parameters | VERIFIED | Line 5: `import { clusterForce, clusterRepulsionForce }`; Line 37: `.force('clusterRepulsion', clusterRepulsionForce(0.8, 150))`; charge `-50`, collide radius `40` iterations `3`, center strength `0.02`, x/y strength `0.01` |
+| `web/src/viz/renderer.ts` | Smooth quadratic hull paths, `HULL_PADDING=35` | VERIFIED | Line 11: `HULL_PADDING = 35`; Lines 161-180: midpoint-start + `quadraticCurveTo` loop (no `lineTo` sharp corners) |
+
+#### Gap 2 Closure (pan/zoom — plan 02-05)
+
+| Artifact | Expected | Status | Details |
+|----------|----------|--------|---------|
+| `web/src/viz/VizPage.tsx` | `ViewTransform` interface + `viewTransform` state + pan/zoom handlers + auto-fit | VERIFIED | Lines 15-19: `ViewTransform {x, y, k}`; Line 62: `viewTransform`; Lines 184-229: `onWheel`, `onMouseDown`, `onMouseUp`, `onMouseMoveGlobal`; Lines 123-143: bounding box auto-fit; cleanup removes all 4 listeners |
+| `web/src/viz/renderer.ts` | `drawFrame` accepts optional `transform` parameter, applies `ctx.translate/scale` | VERIFIED | Lines 225-230: signature updated; Lines 238-242: apply before world drawing; Lines 265-267: `ctx.restore()` after; background fill at Lines 233-235 is before transform |
+
+#### Previously Verified Artifacts (regression check)
+
+| Artifact | Status |
+|----------|--------|
+| `web/src/viz/types.ts` | VERIFIED (unchanged) |
+| `web/src/viz/colors.ts` | VERIFIED (unchanged) |
+| `web/src/viz/animationQueue.ts` | VERIFIED (unchanged) |
+| `web/src/viz/sseClient.ts` | VERIFIED (unchanged) |
+| `web/src/viz/StatsOverlay.tsx` | VERIFIED (unchanged) |
+| `web/src/viz/HoverCard.tsx` | VERIFIED (unchanged) |
+| `web/src/api.ts` | VERIFIED (unchanged) |
+| `server/handler.go` | VERIFIED (unchanged) |
+| `main.go` | VERIFIED (unchanged) |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `web/src/app.tsx` | `web/src/viz/VizPage.tsx` | `window.location.pathname === '/viz'` | WIRED | app.tsx line 3 imports VizPage; line 25 conditional render |
-| `web/src/api.ts` | `/api/submissions` | `fetch` GET request | WIRED | api.ts line 49 — `fetch('/api/submissions')` |
-| `main.go` | `server/handler.go` | `GET /api/submissions` route | WIRED | main.go line 34 — `mux.HandleFunc("GET /api/submissions", handler.HandleGetSubmissions())` |
-| `web/src/viz/VizPage.tsx` | `web/src/viz/simulation.ts` | `createSimulation()` in useEffect | WIRED | VizPage.tsx line 6 imports `createSimulation`; line 51 calls it |
-| `web/src/viz/VizPage.tsx` | `web/src/viz/renderer.ts` | `drawFrame()` in requestAnimationFrame loop | WIRED | VizPage.tsx line 7 imports `drawFrame`; line 83 calls it in render loop |
-| `web/src/viz/VizPage.tsx` | `web/src/viz/sseClient.ts` | `connectSSE()` in useEffect | WIRED | VizPage.tsx line 9 imports `connectSSE`; line 130 calls it |
-| `web/src/viz/VizPage.tsx` | `web/src/api.ts` | `fetchSubmissions()` for initial load | WIRED | VizPage.tsx line 3 imports `fetchSubmissions`; line 104 calls it |
-| `web/src/viz/simulation.ts` | `web/src/viz/clusterForce.ts` | `clusterForce()` as simulation force | WIRED | simulation.ts line 5 imports `clusterForce`; line 36 — `.force('cluster', clusterForce(0.15))` |
-| `web/src/viz/renderer.ts` | `web/src/viz/colors.ts` | `LEVEL_COLORS` and `BG_COLOR` | WIRED | renderer.ts lines 5-7 import both; used throughout draw functions |
-| `web/src/viz/StatsOverlay.tsx` | `web/src/viz/VizPage.tsx` | `podCount` and `nsCount` signals | WIRED | StatsOverlay.tsx line 1 imports both signals; lines 18+20 render `{podCount.value}` and `{nsCount.value}` |
-| `web/src/viz/HoverCard.tsx` | `web/src/viz/VizPage.tsx` | `hoveredPod` signal | WIRED | VizPage.tsx line 12 imports `hoveredPod` and `hoverPos`; lines 161-162 set their values in mousemove handler |
-| `web/src/viz/VizPage.tsx` | `d3-force simulation.find()` | `mousemove` handler hit testing | WIRED | VizPage.tsx line 154 — `sim.find(x, y, 20)` |
+| `web/src/viz/simulation.ts` | `web/src/viz/clusterForce.ts` | `import clusterRepulsionForce` + `.force('clusterRepulsion', ...)` | WIRED | Line 5: import; Line 37: registered as force |
+| `web/src/viz/VizPage.tsx` | `web/src/viz/renderer.ts` | `drawFrame(..., viewTransform)` | WIRED | Line 7: import; Line 93: call with transform argument |
+| `web/src/viz/VizPage.tsx` | `web/src/viz/HoverCard.tsx` | `hoverPos.value` set in screen-space after transform | WIRED | Line 12: import `hoverPos`; Lines 253-255: world→screen conversion before assignment |
+| `web/src/viz/VizPage.tsx` (onWheel) | viewTransform state | zoom math with fixed-point cursor | WIRED | Lines 193-198: `newK`, `viewTransform.x/y` adjusted, `viewTransform.k = newK` |
+| `web/src/viz/VizPage.tsx` (onMouseMoveGlobal) | viewTransform state | pan delta computation | WIRED | Lines 220-223: `viewTransform.x = panStartTX + (e.clientX - panStartX)` |
+
+Previously verified key links (unchanged): app.tsx→VizPage, api.ts→/api/submissions, main.go→handler.go, VizPage→simulation, VizPage→renderer, VizPage→sseClient, VizPage→api.ts, simulation→clusterForce, renderer→colors, StatsOverlay→VizPage signals, HoverCard→VizPage signals, VizPage→sim.find() hover detection — all WIRED (no regressions detected).
 
 ### Requirements Coverage
 
 | Requirement | Source Plans | Description | Status | Evidence |
 |-------------|-------------|-------------|--------|----------|
-| VIZZ-01 | 01-PLAN, 02-PLAN | New submissions appear as pods within 1-2 seconds via SSE | SATISFIED | `sseClient.ts` EventSource + `VizPage.tsx` connectSSE wired |
-| VIZZ-02 | 02-PLAN | Pods grouped into namespace clusters based on location | SATISFIED | `clusterForce.ts` groups by `clusterId`; `renderer.ts` `computeClusters` |
-| VIZZ-03 | 02-PLAN | Namespace clusters labeled with K8s-style naming (ns/XX) | SATISFIED | `renderer.ts:181` — `${cluster.countryFlag} ns/${cluster.countryCode}` |
-| VIZZ-04 | 02-PLAN | New pods animate in smoothly | SATISFIED | `animationQueue.ts` staggered queue; `renderer.ts` `easeBackOut` scale + `shadowBlur` glow |
-| VIZZ-05 | 01-PLAN | K8s-themed visual language (rounded-rect shapes) | SATISFIED | `renderer.ts:90` — `ctx.roundRect(-w/2, -h/2, w, h, r)` with `LEVEL_COLORS` fill |
-| VIZZ-06 | 01-PLAN, 02-PLAN | Pods display attendee name and selected emoji | SATISFIED | `renderer.ts:103` — `${node.homelabEmoji} ${truncate(node.name, 8)}` |
-| VIZZ-07 | 02-PLAN | Pods arrange organically using D3 force simulation | SATISFIED | `simulation.ts` — 6 forces: charge, collide, center, cluster, x, y |
-| VIZZ-08 | 03-PLAN | Live stats overlay shows pod count and namespace count | SATISFIED | `StatsOverlay.tsx` renders reactive counts; CSS positions fixed top-left |
-| VIZZ-09 | 03-PLAN | Presenter can hover over pods to see full attendee details | SATISFIED (code) | `sim.find()` hit testing + `HoverCard.tsx`; needs human interaction verification |
-| VIZZ-10 | 02-PLAN, 03-PLAN | Handles 100-500 pods without performance degradation | SATISFIED (human-approved in plan 03) | Human checkpoint was marked approved; needs re-confirmation if desired |
+| VIZZ-01 | 01, 02, 05 | New submissions appear as pods within 1-2 seconds via SSE | SATISFIED | `sseClient.ts` EventSource + `VizPage.tsx` connectSSE wired; unchanged from previous verification |
+| VIZZ-02 | 02, 04 | Pods grouped into namespace clusters based on location | SATISFIED | `clusterForce.ts` groups by `clusterId`; `renderer.ts` `computeClusters`; gap closure adds `clusterRepulsionForce` to prevent overlap |
+| VIZZ-03 | 02, 04 | Namespace clusters labeled with K8s-style naming (ns/XX) | SATISFIED | `renderer.ts:194` — `${cluster.countryFlag} ns/${cluster.countryCode}`; clusters now separated so labels are readable |
+| VIZZ-04 | 02, 05 | New pods animate in smoothly | SATISFIED | `animationQueue.ts` staggered queue; `renderer.ts` `easeBackOut` scale + `shadowBlur` glow; unchanged |
+| VIZZ-05 | 01, 02, 05 | K8s-themed visual language (rounded-rect shapes) | SATISFIED | `renderer.ts:90` — `ctx.roundRect(-w/2, -h/2, w, h, r)` with `LEVEL_COLORS` fill; unchanged |
+| VIZZ-06 | 01, 02, 05 | Pods display attendee name and selected emoji | SATISFIED | `renderer.ts:103` — `${node.homelabEmoji} ${truncate(node.name, 8)}`; unchanged |
+| VIZZ-07 | 02, 04 | Pods arrange organically using D3 force simulation | SATISFIED | `simulation.ts` — 7 forces including new `clusterRepulsion`; 200 precompute ticks |
+| VIZZ-08 | 03, 05 | Live stats overlay shows pod count and namespace count | SATISFIED | `StatsOverlay.tsx` renders reactive counts; CSS positions fixed top-left; unchanged |
+| VIZZ-09 | 03, 05 | Presenter can hover over pods to see full attendee details | SATISFIED (code) | `sim.find()` with transform-aware world coords + `HoverCard.tsx`; HoverCard position now transform-aware |
+| VIZZ-10 | 02, 03, 05 | Handles 100-500 pods without performance degradation | SATISFIED (human check needed) | Pan/zoom added so presenter can navigate large visualizations; Canvas rendering unchanged; needs re-confirmation under load |
 
-**Coverage:** 10/10 VIZZ requirements claimed across the 3 plans. No orphaned requirements.
+**Coverage:** 10/10 VIZZ requirements covered across 5 plans. No orphaned requirements.
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `web/src/viz/HoverCard.tsx` | 26 | `return null` | INFO | Intentional — correct conditional rendering when no pod is hovered; not a stub |
+| `web/src/viz/HoverCard.tsx` | 26 | `return null` | INFO | Intentional conditional rendering when no pod is hovered — not a stub |
 
-No blocker or warning anti-patterns found. No TODO/FIXME/PLACEHOLDER comments in any viz files.
+No new anti-patterns introduced by plans 02-04 or 02-05. No TODO/FIXME/PLACEHOLDER comments in any viz file.
+
+### Build Verification
+
+- `cd web && npx tsc --noEmit` — exits 0 (no output)
+- `cd web && npm run build` — 80 modules, 59.56 kB JS, exits 0
+
+### Commit Verification
+
+All commits claimed in summaries are present in git history:
+- `269c3d8` — feat(02-04): add inter-cluster repulsion force and tune simulation parameters
+- `766c5db` — feat(02-04): smooth hull corners and increase hull padding for visual clarity
+- `7431d2e` — docs(02-04): complete cluster overlap fix plan
+- `1d67674` — feat(02-05): add canvas pan/zoom with auto-fit and transform-aware hover
+- `a54cd6a` — docs(02-05): complete canvas pan/zoom plan
 
 ### Human Verification Required
 
-#### 1. Visual Canvas Rendering
+#### 1. Visual Canvas Rendering with Separated Clusters
 
-**Test:** Start dev servers (`make dev`). Open http://localhost:5173/viz with at least one prior submission in the database.
-**Expected:** Full-screen dark canvas (#0f172a) showing colored rounded-rect pods grouped by country. Pods labeled with emoji + truncated name. Namespace clusters have convex hull boundaries and K8s-style `flag ns/CODE` badge labels above each cluster.
-**Why human:** Canvas 2D rendering output cannot be verified by static analysis.
+**Test:** Start dev servers (`make dev`). Open http://localhost:5173/viz with submissions from at least 3 different countries.
+**Expected:** Full-screen dark canvas (#0f172a) showing colored rounded-rect pods. Each country forms a distinct cluster with a smooth rounded hull boundary. Clusters have visible gaps between them — no hull overlap. Namespace badge labels (`flag ns/CODE`) are readable without overlapping adjacent clusters.
+**Why human:** Canvas 2D rendering output and visual cluster separation cannot be verified by static analysis.
 
 #### 2. SSE Real-Time Pod Appearance
 
@@ -139,37 +191,47 @@ No blocker or warning anti-patterns found. No TODO/FIXME/PLACEHOLDER comments in
 **Expected:** Cursor changes to pointer. HoverCard appears near the pod showing: emoji + full name (top), flag + ns/CODE in monospace font (middle), homelab level description text (bottom). No timestamp visible. Card flips to left side when near right viewport edge.
 **Why human:** Hover detection radius, card positioning, and content layout require manual interaction.
 
-#### 5. 500-Pod Performance
+#### 5. Scroll-to-Zoom
 
-**Test:** Run the load test script from plan 03 task 2 to inject 500 submissions. Reload /viz. Open DevTools Performance tab, record for 5 seconds.
-**Expected:** Frame rate stays above 30fps (60fps ideal) with 500 pods visible and the force simulation actively running.
-**Why human:** Frame rate measurement requires DevTools Performance profiler; plan 03 human checkpoint was marked approved but cannot be re-verified statically.
+**Test:** With /viz open and pods visible, scroll the mouse wheel up and down.
+**Expected:** View zooms in toward the cursor when scrolling up, zooms out when scrolling down. Zoom stays within 0.1x–5x range. All pods, hull boundaries, and namespace labels scale together with the zoom.
+**Why human:** Canvas transform pipeline and zoom center correctness require live interaction.
+
+#### 6. Click-Drag to Pan
+
+**Test:** Click and hold on the canvas, then drag in any direction.
+**Expected:** Canvas pans smoothly with the drag. Cursor changes to "grabbing" during drag. Dragging the mouse beyond the canvas boundary continues to pan (not stuck). Releasing the mouse button stops panning.
+**Why human:** Pan smoothness and window-level listener behavior require manual interaction.
+
+#### 7. Hover Card After Pan/Zoom
+
+**Test:** Pan and zoom the view, then hover over a pod.
+**Expected:** HoverCard appears near the pod at its current screen position — not at its simulation world coordinates. Card is correctly positioned regardless of current zoom level and pan offset.
+**Why human:** Transform-aware coordinate conversion correctness requires interactive verification at different zoom/pan states.
+
+#### 8. Auto-Fit Initial View
+
+**Test:** Load /viz with submissions from 5+ different countries. Observe the initial view before interacting.
+**Expected:** All clusters are visible within the viewport, scaled down proportionally if needed. No clusters are clipped at the viewport edge. The view is centered on the overall layout.
+**Why human:** Auto-fit bounding box behavior requires visual confirmation with spread data.
+
+#### 9. 500-Pod Performance
+
+**Test:** Run a load test to inject 500 submissions. Reload /viz. Open DevTools Performance tab, record for 5 seconds.
+**Expected:** Frame rate stays above 30fps (60fps ideal) with 500 pods visible, force simulation running, and pan/zoom interaction responsive.
+**Why human:** Frame rate measurement requires DevTools Performance profiler.
 
 ### Gaps Summary
 
-All 13 must-have truths pass code-level verification. **2 UX gaps reported during human verification:**
+Both previously identified gaps are closed at the code level:
 
-#### Gap 1: Namespace clusters overlap each other
-- **status:** failed
-- **severity:** high
-- **description:** Clusters are rendered on top of each other, making namespace names and flags unreadable. The D3 force simulation does not provide enough inter-cluster repulsion to keep country groups visually separated. Need stronger cluster separation forces and/or layout constraints that ensure clusters don't overlap.
-- **requirements:** VIZZ-02, VIZZ-03, VIZZ-07
+**Gap 1 (cluster overlap) — CLOSED:** `clusterRepulsionForce` in `clusterForce.ts` pushes namespace cluster centroids apart proportionally to their sizes. Simulation parameters are tuned (stronger charge -50, larger collide radius 40 with 3 iterations, reduced centering forces). Hull corners are smooth via quadratic-curve interpolation and `HULL_PADDING` increased from 25 to 35. Precompute ticks increased from 120 to 200. Visual confirmation of separation still needed.
 
-#### Gap 2: No pan/zoom — cannot navigate large visualizations
-- **status:** failed
-- **severity:** high
-- **description:** When many clusters exist, the viewport is too small to show all namespaces separately without overlap. Need canvas pan (drag to move) and zoom (scroll/pinch to scale) so the user can navigate the visualization, zoom out to see all clusters, and zoom in to inspect individual pods. The layout should use a responsive size limit so clusters spread beyond the viewport when needed, rather than cramming everything into the visible area.
-- **requirements:** VIZZ-10
+**Gap 2 (no pan/zoom) — CLOSED:** Scroll-to-zoom and drag-to-pan implemented in `VizPage.tsx`. `drawFrame` in `renderer.ts` accepts and applies the transform. Hover detection converts screen→world coordinates before `sim.find()`. HoverCard receives world→screen coordinates. Auto-fit bounding box sets initial transform after `precomputeLayout`. All listeners are cleaned up on unmount. Interactive confirmation still needed.
 
-**All other checks pass:**
-- All 15 required artifacts exist with substantive implementations (no stubs)
-- All 12 key links are fully wired (imports + actual usage confirmed)
-- All 10 VIZZ requirement IDs are covered by the three plans with no orphaned requirements
-- TypeScript compiles clean (`tsc --noEmit` exits 0)
-- Vite build succeeds (80 modules, 57 KB JS)
-- Go tests pass (2 GetSubmissions tests + full server suite)
-- Human confirmed: SSE works, stats overlay works, hover card works, entrance animations work, 500-pod performance acceptable
+All 15 must-have truths pass code-level verification. TypeScript compiles clean. Vite build passes. All commits present in git history.
 
 ---
-_Verified: 2026-03-21T22:30:00Z_
+_Verified: 2026-03-21T23:45:00Z_
 _Verifier: Claude (gsd-verifier)_
+_Re-verification: Yes — after gap closure plans 02-04 and 02-05_
