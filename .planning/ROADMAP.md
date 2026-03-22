@@ -64,10 +64,11 @@ Plans:
   3. Admin can delete an individual pod entry and it disappears from the visualization in real-time (broadcast via SSE)
   4. Admin panel displays live stats: total submissions, submissions over time, and top locations
   5. When submissions are closed, the guestbook transitions to a read-only mode that remains visitable as a lasting artifact
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md -- Go backend: auth (session cookies), admin state (toggle + config table), store extensions (delete, stats), SSE event types, admin API endpoints, tests
+- [ ] 03-02-PLAN.md -- Preact frontend: login form, dashboard (toggle, stats, pod list with delete), SSE client extension, viz deletion integration, end-to-end verification
 
 ### Phase 4: Deployment + Validation
 **Goal**: Application runs reliably on the homelab Kubernetes cluster and has been validated under production load conditions identical to the live talk scenario
@@ -93,5 +94,5 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 |-------|----------------|--------|-----------|
 | 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
 | 2. Visualization Engine | 3/5 | Gap closure | - |
-| 3. Admin Panel | 0/? | Not started | - |
+| 3. Admin Panel | 0/2 | Planning complete | - |
 | 4. Deployment + Validation | 0/? | Not started | - |
