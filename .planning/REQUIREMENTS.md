@@ -32,11 +32,11 @@ Requirements for the live KubeCon talk. Each maps to roadmap phases.
 
 ### Admin
 
-- [ ] **ADMN-01**: Admin can open and close submissions with a single toggle button
-- [ ] **ADMN-02**: Admin panel shows real-time stats (total submissions, submissions over time, top locations)
-- [ ] **ADMN-03**: Admin can delete individual pod entries for reactive moderation
-- [ ] **ADMN-04**: Guestbook transitions to read-only mode when submissions are closed (post-talk artifact)
-- [ ] **ADMN-05**: Admin panel is protected by authentication (simple password or shared secret)
+- [x] **ADMN-01**: Admin can open and close submissions with a single toggle button
+- [x] **ADMN-02**: Admin panel shows real-time stats (total submissions, submissions over time, top locations)
+- [x] **ADMN-03**: Admin can delete individual pod entries for reactive moderation
+- [x] **ADMN-04**: Guestbook transitions to read-only mode when submissions are closed (post-talk artifact)
+- [x] **ADMN-05**: Admin panel is protected by authentication (simple password or shared secret)
 
 ### Infrastructure
 
@@ -93,11 +93,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VIZZ-08 | Phase 2 | Complete |
 | VIZZ-09 | Phase 2 | Complete |
 | VIZZ-10 | Phase 2 | Complete |
-| ADMN-01 | Phase 3 | Pending |
-| ADMN-02 | Phase 3 | Pending |
-| ADMN-03 | Phase 3 | Pending |
-| ADMN-04 | Phase 3 | Pending |
-| ADMN-05 | Phase 3 | Pending |
+| ADMN-01 | Phase 3 | Complete |
+| ADMN-02 | Phase 3 | Complete |
+| ADMN-03 | Phase 3 | Complete |
+| ADMN-04 | Phase 3 | Complete |
+| ADMN-05 | Phase 3 | Complete |
 | INFR-01 | Phase 4 | Pending |
 | INFR-02 | Phase 4 | Pending |
 | INFR-03 | Phase 4 | Pending |
