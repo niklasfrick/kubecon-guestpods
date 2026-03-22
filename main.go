@@ -58,7 +58,7 @@ func main() {
 	distFS, err := fs.Sub(webFS, "web/dist")
 	if err == nil {
 		fileServer := http.FileServerFS(distFS)
-		mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			// Try serving the file directly first
 			path := r.URL.Path
 			if path == "/" {
