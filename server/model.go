@@ -95,6 +95,21 @@ var ValidCountryCodes = map[string]bool{
 	"ZA": true, "ZM": true, "ZW": true,
 }
 
+// AdminStats is the JSON response for GET /api/admin/stats.
+type AdminStats struct {
+	TotalPods       int            `json:"total_pods"`
+	NamespaceCount  int            `json:"namespace_count"`
+	TopLocations    []LocationStat `json:"top_locations"`
+	SubmissionsOpen bool           `json:"submissions_open"`
+}
+
+// LocationStat represents a location with its submission count.
+type LocationStat struct {
+	CountryCode string `json:"country_code"`
+	CountryFlag string `json:"country_flag"`
+	Count       int    `json:"count"`
+}
+
 // Validate checks a SubmitRequest and returns an ErrorResponse if invalid, or nil if valid.
 func Validate(req SubmitRequest) *ErrorResponse {
 	if req.Name == "" {

@@ -12,6 +12,12 @@ type SSEHub struct {
 	subscribers map[chan []byte]struct{}
 }
 
+// SSEEvent represents a typed SSE event with a type name and JSON data.
+type SSEEvent struct {
+	Type string // "submission", "deletion", "state"
+	Data []byte
+}
+
 // NewSSEHub creates a new SSE hub.
 func NewSSEHub() *SSEHub {
 	return &SSEHub{
@@ -36,14 +42,21 @@ func (h *SSEHub) Unsubscribe(ch chan []byte) {
 	h.mu.Unlock()
 }
 
-// Broadcast sends data to all subscribed clients. Slow clients that have full
-// buffers are skipped (non-blocking send) to prevent blocking the broadcaster.
+// Broadcast sends data to all subscribed clients as a "submission" event.
+// Kept for backward compatibility; new callers should use BroadcastEvent.
 func (h *SSEHub) Broadcast(data []byte) {
+	h.BroadcastEvent(SSEEvent{Type: "submission", Data: data})
+}
+
+// BroadcastEvent sends a typed SSE event to all subscribers.
+// The event is pre-formatted as SSE text: "event: {type}\ndata: {data}\n\n"
+func (h *SSEHub) BroadcastEvent(event SSEEvent) {
+	msg := []byte(fmt.Sprintf("event: %s\ndata: %s\n\n", event.Type, event.Data))
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 	for ch := range h.subscribers {
 		select {
-		case ch <- data:
+		case ch <- msg:
 		default:
 			// Drop if client is slow -- prevent blocking
 		}
@@ -75,7 +88,8 @@ func (h *SSEHub) HandleSSE() http.HandlerFunc {
 			case <-r.Context().Done():
 				return
 			case data := <-ch:
-				fmt.Fprintf(w, "event: submission\ndata: %s\n\n", data)
+				// data is already pre-formatted SSE text from BroadcastEvent
+				w.Write(data)
 				flusher.Flush()
 			}
 		}

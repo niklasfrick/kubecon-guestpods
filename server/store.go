@@ -36,7 +36,7 @@ func NewStore(dbPath string) (*Store, error) {
 	// Single writer connection -- prevents SQLITE_BUSY
 	db.SetMaxOpenConns(1)
 
-	// Create table if not exists
+	// Create tables if not exist
 	schema := `
 		CREATE TABLE IF NOT EXISTS submissions (
 			id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,6 +47,10 @@ func NewStore(dbPath string) (*Store, error) {
 			deleted       BOOLEAN DEFAULT FALSE
 		);
 		CREATE INDEX IF NOT EXISTS idx_submissions_country ON submissions(country_code) WHERE deleted = FALSE;
+		CREATE TABLE IF NOT EXISTS config (
+			key   TEXT PRIMARY KEY,
+			value TEXT NOT NULL
+		);
 		PRAGMA user_version = 1;
 	`
 	if _, err := db.Exec(schema); err != nil {
@@ -114,6 +118,82 @@ func (s *Store) GetAll() ([]SubmitResponse, error) {
 	}
 
 	return results, nil
+}
+
+// Delete soft-deletes a submission by setting deleted = TRUE.
+func (s *Store) Delete(id int64) error {
+	result, err := s.db.Exec("UPDATE submissions SET deleted = TRUE WHERE id = ? AND deleted = FALSE", id)
+	if err != nil {
+		return fmt.Errorf("soft-delete submission %d: %w", id, err)
+	}
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("submission %d not found or already deleted", id)
+	}
+	return nil
+}
+
+// GetStats returns aggregated submission statistics.
+func (s *Store) GetStats() (*AdminStats, error) {
+	var total int
+	err := s.db.QueryRow("SELECT COUNT(*) FROM submissions WHERE deleted = FALSE").Scan(&total)
+	if err != nil {
+		return nil, fmt.Errorf("count submissions: %w", err)
+	}
+
+	var nsCount int
+	err = s.db.QueryRow("SELECT COUNT(DISTINCT country_code) FROM submissions WHERE deleted = FALSE").Scan(&nsCount)
+	if err != nil {
+		return nil, fmt.Errorf("count namespaces: %w", err)
+	}
+
+	rows, err := s.db.Query(`
+		SELECT country_code, COUNT(*) as cnt
+		FROM submissions WHERE deleted = FALSE
+		GROUP BY country_code ORDER BY cnt DESC LIMIT 5
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("top locations: %w", err)
+	}
+	defer rows.Close()
+
+	var topLocations []LocationStat
+	for rows.Next() {
+		var ls LocationStat
+		if err := rows.Scan(&ls.CountryCode, &ls.Count); err != nil {
+			return nil, fmt.Errorf("scan location: %w", err)
+		}
+		ls.CountryFlag = countryCodeToFlag(ls.CountryCode)
+		topLocations = append(topLocations, ls)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration: %w", err)
+	}
+
+	return &AdminStats{
+		TotalPods:      total,
+		NamespaceCount: nsCount,
+		TopLocations:   topLocations,
+	}, nil
+}
+
+// GetConfig retrieves a config value by key. Returns empty string if key not set.
+func (s *Store) GetConfig(key string) (string, error) {
+	var value string
+	err := s.db.QueryRow("SELECT value FROM config WHERE key = ?", key).Scan(&value)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return value, err
+}
+
+// SetConfig upserts a config key-value pair.
+func (s *Store) SetConfig(key, value string) error {
+	_, err := s.db.Exec(
+		"INSERT INTO config (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?",
+		key, value, value,
+	)
+	return err
 }
 
 // Close closes the underlying database connection.
