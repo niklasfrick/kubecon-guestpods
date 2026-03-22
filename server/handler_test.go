@@ -23,7 +23,9 @@ func setupTestHandler(t *testing.T) (*Handler, func()) {
 	}
 	hub := NewSSEHub()
 	checker := NewProfanityChecker()
-	handler := NewHandler(store, hub, checker, "http://test.local")
+	sessions := NewSessionStore()
+	adminState := NewAdminState(store)
+	handler := NewHandler(store, hub, checker, "http://test.local", sessions, "test-password", adminState)
 	cleanup := func() { store.Close() }
 	return handler, cleanup
 }

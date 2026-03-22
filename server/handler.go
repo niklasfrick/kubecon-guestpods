@@ -2,29 +2,73 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	qrcode "github.com/skip2/go-qrcode"
 )
 
 // Handler holds dependencies for HTTP handlers.
 type Handler struct {
-	store   *Store
-	hub     *SSEHub
-	checker *ProfanityChecker
-	baseURL string
+	store         *Store
+	hub           *SSEHub
+	checker       *ProfanityChecker
+	baseURL       string
+	sessions      *SessionStore
+	adminPassword string
+	adminState    *AdminState
 }
 
 // NewHandler creates a new Handler with all dependencies injected.
-func NewHandler(store *Store, hub *SSEHub, checker *ProfanityChecker, baseURL string) *Handler {
+func NewHandler(store *Store, hub *SSEHub, checker *ProfanityChecker, baseURL string, sessions *SessionStore, adminPassword string, adminState *AdminState) *Handler {
 	return &Handler{
-		store:   store,
-		hub:     hub,
-		checker: checker,
-		baseURL: baseURL,
+		store:         store,
+		hub:           hub,
+		checker:       checker,
+		baseURL:       baseURL,
+		sessions:      sessions,
+		adminPassword: adminPassword,
+		adminState:    adminState,
 	}
+}
+
+// AdminState manages the open/closed state of submissions.
+// In-memory for fast reads on every form submission, persisted to SQLite for restart survival.
+type AdminState struct {
+	mu    sync.RWMutex
+	open  bool
+	store *Store
+}
+
+// NewAdminState creates an AdminState, restoring state from SQLite if previously persisted.
+func NewAdminState(store *Store) *AdminState {
+	state := &AdminState{open: true, store: store}
+	// Restore state from SQLite on startup
+	val, err := store.GetConfig("submissions_open")
+	if err == nil && val == "false" {
+		state.open = false
+	}
+	// Default: open (first run, or if config not set)
+	return state
+}
+
+// IsOpen returns whether submissions are currently open.
+func (a *AdminState) IsOpen() bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.open
+}
+
+// Toggle flips the open/closed state, persists to SQLite, and returns the new state.
+func (a *AdminState) Toggle() (bool, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.open = !a.open
+	err := a.store.SetConfig("submissions_open", fmt.Sprintf("%t", a.open))
+	return a.open, err
 }
 
 // HandleSubmit returns an http.HandlerFunc for POST /api/submissions.
@@ -32,6 +76,11 @@ func NewHandler(store *Store, hub *SSEHub, checker *ProfanityChecker, baseURL st
 // broadcasts via SSE, and returns the submission response.
 func (h *Handler) HandleSubmit() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !h.adminState.IsOpen() {
+			writeJSON(w, http.StatusForbidden, ErrorResponse{Error: "Submissions are closed"})
+			return
+		}
+
 		var req SubmitRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "Invalid JSON body"})
