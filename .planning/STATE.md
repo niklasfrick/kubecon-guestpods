@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-22T20:00:45.301Z"
-last_activity: 2026-03-22 -- Completed Plan 04-02 (Helm Chart)
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-22T20:04:49.162Z"
+last_activity: 2026-03-22 -- Completed Plan 04-01 (App Hardening + Dockerfile)
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
   percent: 83
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 4 of 4 (Deployment + Validation)
-Plan: 2 of 3 in current phase
+Plan: 1 of 3 in current phase
 Status: Executing Phase 4
-Last activity: 2026-03-22 -- Completed Plan 04-02 (Helm Chart)
+Last activity: 2026-03-22 -- Completed Plan 04-01 (App Hardening + Dockerfile)
 
 Progress: [████████░░] 83%
 
@@ -58,6 +58,7 @@ Progress: [████████░░] 83%
 | Phase 03 P01 | 6 | 2 tasks | 12 files |
 | Phase 03 P02 | 25 | 3 tasks | 17 files |
 | Phase 04 P02 | 2 | 2 tasks | 10 files |
+| Phase 04 P01 | 5 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - [Phase 04-02]: existingSecret pattern for admin password -- chart references external Secret
 - [Phase 04-02]: Recreate deployment strategy for SQLite single-writer constraint
 - [Phase 04-02]: cert-manager Certificate resource (conditional on tls.enabled) for origin TLS between Cloudflare and cluster
+- [Phase 04-01]: SSEKeepAliveInterval as package-level var for test overridability (50ms in tests, 30s production)
+- [Phase 04-01]: Distroless static:nonroot base for minimal attack surface and non-root execution
+- [Phase 04-01]: CGO_ENABLED=0 confirmed safe with modernc.org/sqlite pure Go driver
 
 ### Pending Todos
 
@@ -116,6 +120,6 @@ None active.
 
 ## Session Continuity
 
-Last session: 2026-03-22T20:00:45.299Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-22T20:04:49.160Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
