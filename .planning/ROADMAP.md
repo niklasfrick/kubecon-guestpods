@@ -79,10 +79,12 @@ Plans:
   2. Data survives pod restarts and redeployments (kill the pod, verify submissions are still present after restart)
   3. Load test confirms the system handles 500 concurrent submissions within 60 seconds without errors or degraded response times
   4. SSE connections remain stable for 10+ minutes without ingress timeout kills (NGINX proxy-read-timeout configured, keep-alive verified)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md -- App hardening (SSE keep-alive ticker, graceful shutdown) and multi-stage Dockerfile with distroless runtime
+- [ ] 04-02-PLAN.md -- Helm chart: Deployment, Service, PVC, Gateway API HTTPRoute, ConfigMap with sensible defaults for gitops overrides
+- [ ] 04-03-PLAN.md -- GitHub Actions CI/CD release workflow and k6 load test scripts for 500 concurrent submission validation
 
 ## Progress
 
@@ -95,4 +97,4 @@ Note: Phases 2 and 3 both depend on Phase 1 but are independent of each other. T
 | 1. Server Core + Submission Form | 2/2 | Complete   | 2026-03-20 |
 | 2. Visualization Engine | 5/5 | Complete | 2026-03-22 |
 | 3. Admin Panel | 2/2 | Complete | 2026-03-22 |
-| 4. Deployment + Validation | 0/? | Not started | - |
+| 4. Deployment + Validation | 0/3 | Planning complete | - |
