@@ -1,0 +1,70 @@
+# Image configuration
+image:
+  repository: ghcr.io/niklas/kubecon-guestbook
+  tag: ""  # Overridden by appVersion if empty
+  pullPolicy: IfNotPresent
+
+# Replica count -- MUST be 1 (SQLite single-writer constraint)
+replicaCount: 1
+
+# Application configuration
+config:
+  # Base URL for QR code generation (override with actual domain)
+  baseURL: "https://guestbook.example.com"
+  # Listen address (container-internal)
+  addr: ":8080"
+
+# Admin password -- reference an existing Kubernetes Secret
+adminPassword:
+  existingSecret: "guestbook-admin"
+  key: "password"
+
+# Persistence for SQLite database
+persistence:
+  enabled: true
+  storageClass: ""  # Use cluster default; override with e.g. "rook-ceph-block" in gitops
+  size: 1Gi
+  accessMode: ReadWriteOnce
+  # Prevent data loss on helm uninstall
+  annotations:
+    helm.sh/resource-policy: keep
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+
+# Gateway API HTTPRoute
+httpRoute:
+  enabled: true
+  gateway:
+    name: main-gateway
+    namespace: default
+  domain: guestbook.example.com
+
+# TLS via cert-manager Certificate resource
+tls:
+  enabled: true
+  issuer: letsencrypt-prod
+  issuerKind: ClusterIssuer  # ClusterIssuer or Issuer
+  secretName: guestbook-tls
+
+# Resource limits
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# Health probes
+probes:
+  liveness:
+    path: /api/health
+    initialDelaySeconds: 5
+    periodSeconds: 15
+  readiness:
+    path: /api/health
+    initialDelaySeconds: 3
+    periodSeconds: 10
