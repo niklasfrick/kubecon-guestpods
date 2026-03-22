@@ -60,6 +60,15 @@ export function VizPage() {
 
     // --- View transform (pan/zoom) ---
     const viewTransform: ViewTransform = { x: 0, y: 0, k: 1 };
+    let userInteracting = false;
+    let userInteractTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    /** Mark that user is manually controlling the camera; auto-fit resumes after 3s idle. */
+    function markUserInteraction() {
+      userInteracting = true;
+      if (userInteractTimeout) clearTimeout(userInteractTimeout);
+      userInteractTimeout = setTimeout(() => { userInteracting = false; }, 3000);
+    }
 
     // --- Animation Queue ---
     const queue = new AnimationQueue(50); // Start with 50ms for initial load
@@ -87,6 +96,58 @@ export function VizPage() {
       // Update entrance animations
       if (!prefersReducedMotion) {
         updateAnimations(allNodes, now);
+      }
+
+      // --- Continuous auto-fit (unless user is interacting) ---
+      // Fits camera to the core ~85% of nodes (by distance from weighted center).
+      // Small outlier clusters at the edges don't force premature zoom-out.
+      if (!userInteracting) {
+        const visible = allNodes.filter(n => n.x != null && n.y != null && (n.animProgress > 0 || n.animStartTime > 0));
+        if (visible.length > 0) {
+          // Weighted center biased toward bigger clusters
+          const clusterSizes = new Map<string, number>();
+          for (const n of visible) {
+            clusterSizes.set(n.clusterId, (clusterSizes.get(n.clusterId) || 0) + 1);
+          }
+          let wcx = 0, wcy = 0, totalWeight = 0;
+          for (const n of visible) {
+            const w = clusterSizes.get(n.clusterId)!;
+            wcx += n.x! * w;
+            wcy += n.y! * w;
+            totalWeight += w;
+          }
+          wcx /= totalWeight;
+          wcy /= totalWeight;
+
+          // Sort by distance from weighted center, take 85%
+          visible.sort((a, b) => {
+            const da = (a.x! - wcx) ** 2 + (a.y! - wcy) ** 2;
+            const db = (b.x! - wcx) ** 2 + (b.y! - wcy) ** 2;
+            return da - db;
+          });
+          const fitNodes = visible.slice(0, Math.ceil(visible.length * 0.85));
+
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          for (const n of fitNodes) {
+            minX = Math.min(minX, n.x!);
+            maxX = Math.max(maxX, n.x!);
+            minY = Math.min(minY, n.y!);
+            maxY = Math.max(maxY, n.y!);
+          }
+          const pad = 60;
+          const worldW = maxX - minX + pad * 2;
+          const worldH = maxY - minY + pad * 2;
+          // Stay at 1:1 until content overflows, then zoom out
+          const targetK = Math.min(cssWidth / worldW, cssHeight / worldH, 1);
+          const targetX = cssWidth / 2 - wcx * targetK;
+          const targetY = cssHeight / 2 - wcy * targetK;
+
+          // Smooth lerp toward target
+          const lerp = 0.05;
+          viewTransform.k += (targetK - viewTransform.k) * lerp;
+          viewTransform.x += (targetX - viewTransform.x) * lerp;
+          viewTransform.y += (targetY - viewTransform.y) * lerp;
+        }
       }
 
       // Draw everything (with pan/zoom transform)
@@ -118,29 +179,6 @@ export function VizPage() {
 
           // Pre-compute layout (200 ticks, synchronous)
           precomputeLayout(sim, allNodes);
-
-          // Auto-fit: compute bounding box and set transform to fit all clusters
-          if (allNodes.length > 0) {
-            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-            for (const n of allNodes) {
-              if (n.x != null && n.y != null) {
-                minX = Math.min(minX, n.x);
-                maxX = Math.max(maxX, n.x);
-                minY = Math.min(minY, n.y);
-                maxY = Math.max(maxY, n.y);
-              }
-            }
-            const worldW = maxX - minX + 200; // 100px padding on each side
-            const worldH = maxY - minY + 200;
-            const scaleX = cssWidth / worldW;
-            const scaleY = cssHeight / worldH;
-            const fitScale = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 1:1
-            const centerX = (minX + maxX) / 2;
-            const centerY = (minY + maxY) / 2;
-            viewTransform.k = fitScale;
-            viewTransform.x = cssWidth / 2 - centerX * fitScale;
-            viewTransform.y = cssHeight / 2 - centerY * fitScale;
-          }
 
           // Cascade the visual entrance
           queue.enqueue([...allNodes]);
@@ -183,13 +221,14 @@ export function VizPage() {
 
     function onWheel(e: WheelEvent) {
       e.preventDefault();
+      markUserInteraction();
 
       const rect = canvas!.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
       // Zoom toward/away from mouse position
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      const zoomFactor = e.deltaY > 0 ? 0.97 : 1.03;
       const newK = Math.max(0.1, Math.min(5, viewTransform.k * zoomFactor));
 
       // Adjust pan so the point under the mouse stays fixed
@@ -201,6 +240,7 @@ export function VizPage() {
     function onMouseDown(e: MouseEvent) {
       // Only pan with left mouse button
       if (e.button !== 0) return;
+      markUserInteraction();
       isPanning = true;
       panStartX = e.clientX;
       panStartY = e.clientY;
@@ -223,10 +263,88 @@ export function VizPage() {
       }
     }
 
+    // --- Touch handlers (mobile pan/zoom) ---
+    let lastTouchDist = 0;
+    let lastTouchMid = { x: 0, y: 0 };
+    let isTouchPanning = false;
+    let touchPanStartX = 0;
+    let touchPanStartY = 0;
+    let touchPanStartTX = 0;
+    let touchPanStartTY = 0;
+
+    function getTouchDist(t1: Touch, t2: Touch) {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function onTouchStart(e: TouchEvent) {
+      e.preventDefault();
+      markUserInteraction();
+      if (e.touches.length === 1) {
+        // Single finger: pan
+        isTouchPanning = true;
+        touchPanStartX = e.touches[0].clientX;
+        touchPanStartY = e.touches[0].clientY;
+        touchPanStartTX = viewTransform.x;
+        touchPanStartTY = viewTransform.y;
+      } else if (e.touches.length === 2) {
+        // Two fingers: pinch-to-zoom
+        isTouchPanning = false;
+        lastTouchDist = getTouchDist(e.touches[0], e.touches[1]);
+        const rect = canvas!.getBoundingClientRect();
+        lastTouchMid = {
+          x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+          y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top,
+        };
+      }
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      e.preventDefault();
+      if (e.touches.length === 1 && isTouchPanning) {
+        viewTransform.x = touchPanStartTX + (e.touches[0].clientX - touchPanStartX);
+        viewTransform.y = touchPanStartTY + (e.touches[0].clientY - touchPanStartY);
+      } else if (e.touches.length === 2) {
+        const dist = getTouchDist(e.touches[0], e.touches[1]);
+        const rect = canvas!.getBoundingClientRect();
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        if (lastTouchDist > 0) {
+          const scale = dist / lastTouchDist;
+          const newK = Math.max(0.1, Math.min(5, viewTransform.k * scale));
+          viewTransform.x = midX - (midX - viewTransform.x) * (newK / viewTransform.k);
+          viewTransform.y = midY - (midY - viewTransform.y) * (newK / viewTransform.k);
+          viewTransform.k = newK;
+        }
+
+        lastTouchDist = dist;
+        lastTouchMid = { x: midX, y: midY };
+      }
+    }
+
+    function onTouchEnd(e: TouchEvent) {
+      if (e.touches.length === 0) {
+        isTouchPanning = false;
+        lastTouchDist = 0;
+      } else if (e.touches.length === 1) {
+        // Went from 2 fingers to 1: start panning from current position
+        isTouchPanning = true;
+        touchPanStartX = e.touches[0].clientX;
+        touchPanStartY = e.touches[0].clientY;
+        touchPanStartTX = viewTransform.x;
+        touchPanStartTY = viewTransform.y;
+      }
+    }
+
     canvas!.addEventListener('wheel', onWheel, { passive: false });
     canvas!.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     window.addEventListener('mousemove', onMouseMoveGlobal);
+    canvas!.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas!.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas!.addEventListener('touchend', onTouchEnd);
 
     // --- Hover detection ---
     let hideTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -291,7 +409,11 @@ export function VizPage() {
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('mousemove', onMouseMoveGlobal);
       canvas!.removeEventListener('mousemove', onMouseMove);
+      canvas!.removeEventListener('touchstart', onTouchStart);
+      canvas!.removeEventListener('touchmove', onTouchMove);
+      canvas!.removeEventListener('touchend', onTouchEnd);
       if (hideTimeout) clearTimeout(hideTimeout);
+      if (userInteractTimeout) clearTimeout(userInteractTimeout);
       window.removeEventListener('resize', onResize);
       clearTimeout(resizeTimer);
     };

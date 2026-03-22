@@ -180,29 +180,68 @@ function drawClusterBoundary(ctx: CanvasRenderingContext2D, cluster: ClusterData
   ctx.fill();
 }
 
-/** Draw namespace label badge above the cluster. */
-function drawNamespaceLabel(ctx: CanvasRenderingContext2D, cluster: ClusterData): void {
+/** Compute axis-aligned bounding box of a cluster (nodes + hull padding). */
+function clusterBBox(cluster: ClusterData): { minX: number; maxX: number; minY: number; maxY: number } {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const n of cluster.nodes) {
+    minX = Math.min(minX, n.x! - HULL_PADDING);
+    maxX = Math.max(maxX, n.x! + HULL_PADDING);
+    minY = Math.min(minY, n.y! - HULL_PADDING);
+    maxY = Math.max(maxY, n.y! + HULL_PADDING);
+  }
+  return { minX, maxX, minY, maxY };
+}
+
+/** Check if a rectangle overlaps any cluster's bounding box (excluding the source cluster). */
+function labelOverlapsOtherCluster(
+  lx: number, ly: number, lw: number, lh: number,
+  sourceId: string, allClusters: ClusterData[]
+): boolean {
+  for (const c of allClusters) {
+    if (c.id === sourceId) continue;
+    const bb = clusterBBox(c);
+    // AABB overlap check
+    if (lx < bb.maxX && lx + lw > bb.minX && ly < bb.maxY && ly + lh > bb.minY) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Draw namespace label badge, trying top/bottom/left/right to avoid overlapping other clusters. */
+function drawNamespaceLabel(ctx: CanvasRenderingContext2D, cluster: ClusterData, allClusters: ClusterData[]): void {
   const nodes = cluster.nodes;
   if (nodes.length === 0) return;
 
-  // Find the topmost node Y to position label above the cluster
-  let topY = Infinity;
-  for (const n of nodes) {
-    if (n.y! < topY) topY = n.y!;
-  }
-
+  const bb = clusterBBox(cluster);
   const label = `${cluster.countryFlag} ns/${cluster.countryCode}`;
   ctx.font = `600 11px ${FONT_STACK}`;
   const metrics = ctx.measureText(label);
-  const padX = 8, padY = 4;
+  const padX = 8;
   const labelW = metrics.width + padX * 2;
   const labelH = 18;
-  const x = cluster.centroidX - labelW / 2;
-  const y = topY - POD_HEIGHT / 2 - HULL_PADDING - labelH - 8; // above hull with gap
+  const gap = 8;
+
+  // Candidate positions: top, bottom, left, right
+  const candidates = [
+    { x: cluster.centroidX - labelW / 2, y: bb.minY - labelH - gap },                    // top
+    { x: cluster.centroidX - labelW / 2, y: bb.maxY + gap },                              // bottom
+    { x: bb.minX - labelW - gap,         y: cluster.centroidY - labelH / 2 },             // left
+    { x: bb.maxX + gap,                  y: cluster.centroidY - labelH / 2 },             // right
+  ];
+
+  // Pick the first candidate that doesn't overlap another cluster
+  let chosen = candidates[0]; // default to top
+  for (const c of candidates) {
+    if (!labelOverlapsOtherCluster(c.x, c.y, labelW, labelH, cluster.id, allClusters)) {
+      chosen = c;
+      break;
+    }
+  }
 
   // Dark badge background
   ctx.beginPath();
-  ctx.roundRect(x, y, labelW, labelH, 4);
+  ctx.roundRect(chosen.x, chosen.y, labelW, labelH, 4);
   ctx.fillStyle = BADGE_BG;
   ctx.fill();
 
@@ -210,7 +249,7 @@ function drawNamespaceLabel(ctx: CanvasRenderingContext2D, cluster: ClusterData)
   ctx.fillStyle = '#ffffff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(label, cluster.centroidX, y + labelH / 2);
+  ctx.fillText(label, chosen.x + labelW / 2, chosen.y + labelH / 2);
 }
 
 /**
@@ -249,9 +288,9 @@ export function drawFrame(
     drawClusterBoundary(ctx, cluster);
   }
 
-  // 5. Draw namespace labels
+  // 5. Draw namespace labels (pass all clusters for overlap avoidance)
   for (const cluster of clusters) {
-    drawNamespaceLabel(ctx, cluster);
+    drawNamespaceLabel(ctx, cluster, clusters);
   }
 
   // 6. Draw pods (sorted by animProgress so newly-animating pods draw on top)

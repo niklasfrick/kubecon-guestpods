@@ -1,8 +1,8 @@
-import { forceSimulation, forceManyBody, forceCollide, forceCenter, forceX, forceY } from 'd3-force';
+import { forceSimulation, forceManyBody, forceCollide } from 'd3-force';
 import type { Simulation } from 'd3-force';
 import type { PodNode } from './types';
 import type { SubmitResponse } from '../api';
-import { clusterForce, clusterRepulsionForce } from './clusterForce';
+import { clusterForce, clusterCenterForce, clusterRepulsionForce } from './clusterForce';
 
 /** Convert a SubmitResponse from the API into a PodNode for the simulation. */
 export function toPodNode(s: SubmitResponse): PodNode {
@@ -32,11 +32,9 @@ export function createSimulation(
   const sim = forceSimulation<PodNode>([])
     .force('charge', forceManyBody<PodNode>().strength(-50).distanceMax(200))
     .force('collide', forceCollide<PodNode>().radius(40).iterations(3))
-    .force('center', forceCenter(width / 2, height / 2).strength(0.02))
     .force('cluster', clusterForce(0.15))
-    .force('clusterRepulsion', clusterRepulsionForce(0.8, 150))
-    .force('x', forceX<PodNode>(width / 2).strength(0.01))
-    .force('y', forceY<PodNode>(height / 2).strength(0.01))
+    .force('clusterCenter', clusterCenterForce(width / 2, height / 2, 0.015))
+    .force('clusterRepulsion', clusterRepulsionForce(1.0, 20))
     .alphaDecay(0.02)
     .velocityDecay(0.3)
     .stop(); // We drive ticks manually via requestAnimationFrame
@@ -71,7 +69,7 @@ export function precomputeLayout(
 ): void {
   sim.nodes(nodes);
   sim.alpha(1);
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 300; i++) {
     sim.tick();
   }
   // After pre-computation, set low alpha so it stays mostly settled
@@ -86,13 +84,9 @@ export function updateCenter(
   width: number,
   height: number
 ): void {
-  const center = sim.force('center') as ReturnType<typeof forceCenter> | null;
-  if (center) {
-    center.x(width / 2).y(height / 2);
+  const cc = sim.force('clusterCenter') as ReturnType<typeof clusterCenterForce> | null;
+  if (cc) {
+    cc.cx(width / 2).cy(height / 2);
   }
-  const fx = sim.force('x') as ReturnType<typeof forceX> | null;
-  const fy = sim.force('y') as ReturnType<typeof forceY> | null;
-  if (fx) fx.x(width / 2);
-  if (fy) fy.y(height / 2);
   sim.alpha(0.3).restart();
 }
