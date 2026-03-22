@@ -2,6 +2,7 @@ import { signal } from '@preact/signals';
 import { SubmissionForm } from './components/SubmissionForm';
 import { Confirmation } from './components/Confirmation';
 import { VizPage } from './viz/VizPage';
+import { AdminPage } from './admin/AdminPage';
 import type { SubmitResponse } from './api';
 
 type FormState = 'form' | 'submitting' | 'success';
@@ -21,7 +22,10 @@ if (stored) {
 }
 
 export function App() {
-  // Path-based routing: /viz renders visualization, everything else renders form
+  // Path-based routing
+  if (window.location.pathname === '/admin') {
+    return <AdminPage />;
+  }
   if (window.location.pathname === '/viz') {
     return <VizPage />;
   }

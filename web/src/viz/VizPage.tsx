@@ -197,14 +197,31 @@ export function VizPage() {
       // Start render loop
       animFrameId = requestAnimationFrame(render);
 
-      // Connect SSE for real-time updates
-      const closeSSE = connectSSE((data: SubmitResponse) => {
-        const newNode = toPodNode(data);
-        // Check for duplicate (already loaded via initial fetch)
-        if (allNodes.some(n => n.id === newNode.id)) return;
-        allNodes = addNodes(sim, allNodes, [newNode]);
-        queue.enqueue([newNode]);
-      });
+      // Connect SSE for real-time updates (submission + deletion events)
+      const closeSSE = connectSSE(
+        // onSubmission
+        (data: SubmitResponse) => {
+          const newNode = toPodNode(data);
+          // Check for duplicate (already loaded via initial fetch)
+          if (allNodes.some(n => n.id === newNode.id)) return;
+          allNodes = addNodes(sim, allNodes, [newNode]);
+          queue.enqueue([newNode]);
+        },
+        // onDeletion
+        (data: { id: number }) => {
+          const idx = allNodes.findIndex(n => n.id === data.id);
+          if (idx !== -1) {
+            allNodes = allNodes.filter(n => n.id !== data.id);
+            sim.nodes(allNodes);
+            sim.alpha(0.1).restart(); // Gentle reheat to fill the gap
+
+            // Clear hover if the deleted node was hovered
+            if (hoveredPod.value && hoveredPod.value.id === data.id) {
+              hoveredPod.value = null;
+            }
+          }
+        }
+      );
 
       // Store cleanup for SSE
       sseCleanup = closeSSE;
