@@ -1,0 +1,27 @@
+# Database files
+guestbook.db
+guestbook.db-wal
+guestbook.db-shm
+
+# Build artifacts
+bin/
+web/node_modules/
+web/dist/
+
+# Git and CI
+.git
+.github
+.gitignore
+
+# Planning docs
+.planning/
+
+# IDE
+.vscode/
+.idea/
+
+# Load tests (not needed in image)
+loadtest/
+
+# Helm chart (not needed in image)
+chart/
