@@ -1,0 +1,15 @@
+{{- if .Values.tls.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "guestbook.fullname" . }}-tls
+  labels:
+    {{- include "guestbook.labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Values.tls.secretName }}
+  issuerRef:
+    name: {{ .Values.tls.issuer }}
+    kind: {{ .Values.tls.issuerKind }}
+  dnsNames:
+    - {{ .Values.httpRoute.domain | quote }}
+{{- end }}
