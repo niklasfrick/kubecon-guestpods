@@ -30,8 +30,8 @@ type ErrorResponse struct {
 var HomelabEmojis = map[int]string{
 	1: "\U0001F4AD",     // thinking bubble
 	2: "\U0001F353",     // strawberry (Pi)
-	3: "\U0001F5A5\uFE0F", // desktop computer
-	4: "\U0001F5C4\uFE0F", // file cabinet (rack)
+	3: "\U0001F4BB",     // laptop computer
+	4: "\U0001F911",     // money-mouth face
 	5: "\U0001F680",     // rocket
 }
 

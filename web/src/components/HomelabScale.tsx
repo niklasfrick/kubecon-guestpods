@@ -1,10 +1,10 @@
 const levels = [
   { level: 1, emoji: "\u{1F4AD}", label: "What's a homelab?" },
   { level: 2, emoji: "\u{1F353}", label: "A Pi and a dream" },
-  { level: 3, emoji: "\u{1F5A5}\uFE0F", label: "The spare laptop era" },
+  { level: 3, emoji: "\u{1F4BB}", label: "The spare laptop era" },
   {
     level: 4,
-    emoji: "\u{1F5C4}\uFE0F",
+    emoji: "\u{1F911}",
     label: "My partner asks about the electricity bill",
   },
   {
