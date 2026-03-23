@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
 status: milestone_complete
-stopped_at: v1.0 milestone archived
-last_updated: "2026-03-23T14:51:48.000Z"
-last_activity: 2026-03-23 - Completed quick task 260323-ly6: Update Helm chart - remove cert/TLS config, add annotations and extraObjects
+stopped_at: Completed quick task 260323-m8z
+last_updated: "2026-03-23T15:06:19.000Z"
+last_activity: 2026-03-23 - Completed quick task 260323-m8z: Adjust all repository and Docker image references to kubecon-guestpods
 progress:
   total_phases: 4
   completed_phases: 4
@@ -72,9 +72,10 @@ None active.
 | 260323-l8f | Put KubeCon 2026 in the website title | 2026-03-23 | 264acc8 | [260323-l8f-put-kubecon-2026-in-the-website-title-to](./quick/260323-l8f-put-kubecon-2026-in-the-website-title-to/) |
 | 260323-lhx | Show user info in status bar and highlight own pod | 2026-03-23 | b6b00e0 | [260323-lhx-show-user-info-in-status-bar-and-highlig](./quick/260323-lhx-show-user-info-in-status-bar-and-highlig/) |
 | 260323-ly6 | Update Helm chart - remove cert/TLS config, add annotations and extraObjects | 2026-03-23 | 5e3e155 | [260323-ly6-update-helm-chart-remove-cert-tls-config](./quick/260323-ly6-update-helm-chart-remove-cert-tls-config/) |
+| 260323-m8z | Adjust all repository and Docker image references to kubecon-guestpods | 2026-03-23 | 25574cd | [260323-m8z-adjust-all-repository-and-docker-image-r](./quick/260323-m8z-adjust-all-repository-and-docker-image-r/) |
 
 ## Session Continuity
 
 Last session: 2026-03-23
-Stopped at: Completed quick task 260323-ly6
+Stopped at: Completed quick task 260323-m8z
 Resume file: None
