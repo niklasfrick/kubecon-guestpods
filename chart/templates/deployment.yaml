@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "guestbook.fullname" . }}
+  name: {{ include "guestpods.fullname" . }}
   labels:
-    {{- include "guestbook.labels" . | nindent 4 }}
+    {{- include "guestpods.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   strategy:
     type: Recreate  # SQLite single-writer -- no rolling update
   selector:
     matchLabels:
-      {{- include "guestbook.selectorLabels" . | nindent 6 }}
+      {{- include "guestpods.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "guestbook.selectorLabels" . | nindent 8 }}
+        {{- include "guestpods.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: guestbook
-          image: {{ include "guestbook.image" . }}
+        - name: guestpods
+          image: {{ include "guestpods.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -31,10 +31,10 @@ spec:
                   name: {{ .Values.adminPassword.existingSecret }}
                   key: {{ .Values.adminPassword.key }}
             - name: DB_PATH
-              value: /data/guestbook.db
+              value: /data/guestpods.db
           envFrom:
             - configMapRef:
-                name: {{ include "guestbook.fullname" . }}
+                name: {{ include "guestpods.fullname" . }}
           livenessProbe:
             httpGet:
               path: {{ .Values.probes.liveness.path }}
@@ -59,5 +59,5 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: {{ include "guestbook.fullname" . }}-data
+            claimName: {{ include "guestpods.fullname" . }}-data
       {{- end }}

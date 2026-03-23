@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "guestbook.name" -}}
+{{- define "guestpods.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "guestbook.fullname" -}}
+{{- define "guestpods.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,9 +24,9 @@ Create a default fully qualified app name.
 {{/*
 Common labels
 */}}
-{{- define "guestbook.labels" -}}
-helm.sh/chart: {{ include "guestbook.name" . }}-{{ .Chart.Version | replace "+" "_" }}
-{{ include "guestbook.selectorLabels" . }}
+{{- define "guestpods.labels" -}}
+helm.sh/chart: {{ include "guestpods.name" . }}-{{ .Chart.Version | replace "+" "_" }}
+{{ include "guestpods.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Values.image.tag | default .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
@@ -34,14 +34,14 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "guestbook.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "guestbook.name" . }}
+{{- define "guestpods.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "guestpods.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Image reference
 */}}
-{{- define "guestbook.image" -}}
+{{- define "guestpods.image" -}}
 {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
 {{- end }}

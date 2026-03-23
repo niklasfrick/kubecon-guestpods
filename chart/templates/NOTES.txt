@@ -1,15 +1,15 @@
-KubeCon Guestbook deployed!
+KubeCon Guestpods deployed!
 
 Application URL: https://{{ .Values.httpRoute.domain }}
 
 To check the status:
-  kubectl get pods -l app.kubernetes.io/name={{ include "guestbook.name" . }},app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl get pods -l app.kubernetes.io/name={{ include "guestpods.name" . }},app.kubernetes.io/instance={{ .Release.Name }}
 
 To view logs:
-  kubectl logs -l app.kubernetes.io/name={{ include "guestbook.name" . }} -f
+  kubectl logs -l app.kubernetes.io/name={{ include "guestpods.name" . }} -f
 
 Health check:
-  kubectl port-forward svc/{{ include "guestbook.fullname" . }} 8080:{{ .Values.service.port }}
+  kubectl port-forward svc/{{ include "guestpods.fullname" . }} 8080:{{ .Values.service.port }}
   curl http://localhost:8080/api/health
 
 IMPORTANT: Create the admin password secret before first use:

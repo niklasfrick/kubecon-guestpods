@@ -1,7 +1,7 @@
 # Image configuration
 image:
-  repository: ghcr.io/niklas/kubecon-guestbook
-  tag: ""  # Overridden by appVersion if empty
+  repository: ghcr.io/niklasfrick/kubecon-guestpods
+  tag: "" # Overridden by appVersion if empty
   pullPolicy: IfNotPresent
 
 # Replica count -- MUST be 1 (SQLite single-writer constraint)
@@ -22,7 +22,7 @@ adminPassword:
 # Persistence for SQLite database
 persistence:
   enabled: true
-  storageClass: ""  # Use cluster default; override with e.g. "rook-ceph-block" in gitops
+  storageClass: "" # Use cluster default; override with e.g. "rook-ceph-block" in gitops
   size: 1Gi
   accessMode: ReadWriteOnce
   # Prevent data loss on helm uninstall

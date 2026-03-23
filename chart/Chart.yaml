@@ -1,6 +1,6 @@
 apiVersion: v2
-name: kubecon-guestbook
-description: Live KubeCon audience participation guestbook with K8s cluster visualization
+name: kubecon-guestpods
+description: Live KubeCon audience participation guestpods with K8s cluster visualization
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
