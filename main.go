@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/niklas/kubecon-guestbook/server"
+	"github.com/niklasfrick/kubecon-guestpods/server"
 )
 
 func main() {

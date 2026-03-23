@@ -1,4 +1,4 @@
-module github.com/niklas/kubecon-guestbook
+module github.com/niklasfrick/kubecon-guestpods
 
 go 1.26.1
 
