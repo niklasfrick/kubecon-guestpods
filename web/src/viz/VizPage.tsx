@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'preact/hooks';
 import { signal } from '@preact/signals';
 import { fetchSubmissions } from '../api';
 import type { SubmitResponse } from '../api';
+import { appView } from '../app';
 import type { PodNode } from './types';
 import { createSimulation, toPodNode, addNodes, precomputeLayout, updateCenter } from './simulation';
 import { drawFrame, updateAnimations, computeStats } from './renderer';
@@ -222,8 +223,12 @@ export function VizPage() {
             }
           }
         },
-        // onState
-        undefined,
+        // onState — when admin toggles submissions, update attendee view
+        (data: { submissions_open: boolean }) => {
+          if (data.submissions_open) {
+            appView.value = 'form';
+          }
+        },
         // onClear
         () => {
           allNodes = [];

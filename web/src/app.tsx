@@ -2,13 +2,10 @@ import { signal } from '@preact/signals';
 import { SubmissionForm } from './components/SubmissionForm';
 import { VizPage } from './viz/VizPage';
 import { AdminPage } from './admin/AdminPage';
-import type { SubmitResponse } from './api';
-
 type AppView = 'loading' | 'form' | 'viz';
-type FormState = 'form' | 'submitting' | 'success';
+type FormState = 'form' | 'submitting';
 
 export const formState = signal<FormState>('form');
-export const submissionData = signal<SubmitResponse | null>(null);
 
 // Determine initial view: already submitted → viz, otherwise check server
 const hasSubmitted = localStorage.getItem('guestbook_submission') !== null;

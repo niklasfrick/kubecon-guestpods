@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { submitEntry, SubmissionError } from "../api";
-import { formState, submissionData, appView } from "../app";
+import { formState, appView } from "../app";
 import { TextInput } from "./TextInput";
 import { CountrySelect } from "./CountrySelect";
 import { HomelabScale } from "./HomelabScale";
@@ -59,7 +59,6 @@ export function SubmissionForm() {
         homelab_level: homelabLevel!,
       });
 
-      submissionData.value = response;
       localStorage.setItem("guestbook_submission", JSON.stringify(response));
       appView.value = 'viz';
     } catch (err) {

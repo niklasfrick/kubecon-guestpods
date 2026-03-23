@@ -261,64 +261,6 @@ body {
   }
 }
 
-/* Confirmation screen */
-.confirmation {
-  text-align: center;
-  animation: fadeIn 200ms ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.confirmation-check {
-  font-size: 48px;
-  color: var(--color-text-success);
-  margin-bottom: var(--space-sm);
-}
-
-.confirmation h1 {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--color-text-success);
-  margin-bottom: var(--space-md);
-}
-
-.confirmation-identity {
-  font-size: 20px;
-  margin-bottom: var(--space-xs);
-}
-
-.confirmation-namespace {
-  font-family: var(--font-mono);
-  font-size: 16px;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-md);
-}
-
-.confirmation-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  font-size: 16px;
-  margin-bottom: var(--space-lg);
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--color-text-success);
-  border-radius: 50%;
-}
-
-.confirmation-cta {
-  font-size: 14px;
-  font-style: italic;
-  color: var(--color-text-secondary);
-}
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {

@@ -14,7 +14,7 @@ Requirements for the live KubeCon talk. Each maps to roadmap phases.
 - [x] **SUBM-03**: Attendee can submit their name on a mobile-friendly form
 - [x] **SUBM-04**: Attendee can select their location from a pre-defined dropdown
 - [x] **SUBM-05**: Attendee can select a homelab emoji from a curated grid of 15-25 themed emojis
-- [x] **SUBM-06**: Attendee sees a "You're now a pod in the cluster!" confirmation after submitting
+- [x] **SUBM-06**: Attendee sees themselves appear in the live visualization after submitting
 - [x] **SUBM-07**: Name field is filtered against a profanity blocklist before accepting submission
 
 ### Visualization

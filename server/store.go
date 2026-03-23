@@ -103,7 +103,7 @@ func (s *Store) GetAll() ([]SubmitResponse, error) {
 	}
 	defer rows.Close()
 
-	var results []SubmitResponse
+	results := make([]SubmitResponse, 0)
 	for rows.Next() {
 		var resp SubmitResponse
 		if err := rows.Scan(&resp.ID, &resp.Name, &resp.CountryCode, &resp.HomelabLevel, &resp.CreatedAt); err != nil {

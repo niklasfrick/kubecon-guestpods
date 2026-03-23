@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Requirements**: SUBM-01, SUBM-02, SUBM-03, SUBM-04, SUBM-05, SUBM-06, SUBM-07, INFR-04
 **Success Criteria** (what must be TRUE):
   1. Attendee can open a short URL on a phone and see a mobile-friendly submission form that loads in under 2 seconds on a throttled connection
-  2. Attendee can enter their name, select a location from a dropdown, pick a homelab emoji from a curated grid, and submit -- receiving a "You're now a pod!" confirmation
+  2. Attendee can enter their name, select a location from a dropdown, pick a homelab emoji from a curated grid, and submit -- seeing themselves appear in the live visualization
   3. Submitting a name containing profanity is rejected with a user-friendly message
   4. A QR code is generated that resolves to the submission form URL
   5. An SSE client connected to the server receives a new-submission event within 2 seconds of form submission (verifiable via curl or browser DevTools)
