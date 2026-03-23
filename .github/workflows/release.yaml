@@ -34,10 +34,13 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # IMPORTANT: Git tags MUST be strict 3-part semver (e.g., v1.0.0, v1.1.0)
+          # 2-part tags like v1.0 will NOT produce semver image tags, only SHA fallback
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=,format=short
+            type=raw,value=latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
