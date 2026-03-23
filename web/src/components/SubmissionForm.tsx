@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
 import { submitEntry, SubmissionError } from "../api";
 import { formState, appView } from "../app";
+import { currentUserId, currentUserInfo } from "../viz/VizPage";
 import { TextInput } from "./TextInput";
 import { CountrySelect } from "./CountrySelect";
 import { HomelabScale } from "./HomelabScale";
@@ -60,6 +61,13 @@ export function SubmissionForm() {
       });
 
       localStorage.setItem("guestbook_submission", JSON.stringify(response));
+      // Update viz signals instantly so status bar + pod glow work without reload
+      currentUserId.value = response.id;
+      currentUserInfo.value = {
+        name: response.name,
+        countryFlag: response.country_flag,
+        homelabEmoji: response.homelab_emoji,
+      };
       appView.value = 'viz';
     } catch (err) {
       formState.value = "form";

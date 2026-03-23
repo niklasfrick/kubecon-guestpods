@@ -40,6 +40,21 @@ export function VizPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Re-read localStorage on mount in case it was set after module init
+    // (e.g. form submission in the same SPA session)
+    if (currentUserId.value === null) {
+      const stored = localStorage.getItem('guestbook_submission');
+      if (stored) {
+        const parsed = JSON.parse(stored) as SubmitResponse;
+        currentUserId.value = parsed.id;
+        currentUserInfo.value = {
+          name: parsed.name,
+          countryFlag: parsed.country_flag,
+          homelabEmoji: parsed.homelab_emoji,
+        };
+      }
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 

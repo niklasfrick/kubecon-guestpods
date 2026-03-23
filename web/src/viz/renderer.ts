@@ -74,18 +74,21 @@ function drawPod(ctx: CanvasRenderingContext2D, node: PodNode): void {
 
   if (progress <= 0) return;
 
-  const scale = easeBackOut(Math.min(progress, 1));
+  const isCurrentUser = currentUserId.value !== null && node.id === currentUserId.value;
+  const baseScale = easeBackOut(Math.min(progress, 1));
+  // User's own pod is 20% larger to stand out
+  const scale = isCurrentUser ? baseScale * 1.2 : baseScale;
 
   ctx.save();
   ctx.translate(node.x!, node.y!);
   ctx.scale(scale, scale);
 
   // Glow effect
-  const isCurrentUser = currentUserId.value !== null && node.id === currentUserId.value;
   if (isCurrentUser) {
-    // Persistent glow for the user's own pod
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 20;
+    // Pulsating glow for the user's own pod — oscillates between 18 and 35
+    const pulse = Math.sin(performance.now() / 400) * 0.5 + 0.5; // 0..1
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 18 + pulse * 17;
   } else if (node.glowOpacity > 0) {
     // Temporary entrance glow for other pods
     ctx.shadowColor = color;
@@ -101,6 +104,15 @@ function drawPod(ctx: CanvasRenderingContext2D, node: PodNode): void {
   // Reset shadow for text
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
+
+  // White outline ring for user's own pod
+  if (isCurrentUser) {
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(-w / 2 - 3, -h / 2 - 3, w + 6, h + 6, r + 2);
+    ctx.stroke();
+  }
 
   // Pod label: emoji + truncated name
   ctx.fillStyle = '#ffffff';
