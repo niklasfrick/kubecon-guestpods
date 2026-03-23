@@ -55,6 +55,28 @@ body {
   padding: var(--space-lg) var(--space-md);
 }
 
+/* Form brand header */
+.form-brand {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.form-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+  margin-bottom: var(--space-xs);
+}
+
+.form-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
 /* Form layout */
 .form-fields {
   display: flex;

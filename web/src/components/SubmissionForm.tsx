@@ -92,6 +92,10 @@ export function SubmissionForm() {
 
   return (
     <div class="card">
+      <div class="form-brand">
+        <h1 class="form-title">Guestpods</h1>
+        <p class="form-subtitle">KubeCon 2026</p>
+      </div>
       {bannerError && (
         <ErrorBanner
           message={bannerError}
