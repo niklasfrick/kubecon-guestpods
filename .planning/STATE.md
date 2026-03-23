@@ -5,7 +5,7 @@ milestone_name: MVP
 status: milestone_complete
 stopped_at: v1.0 milestone archived
 last_updated: "2026-03-23T13:30:00.000Z"
-last_activity: 2026-03-23 -- v1.0 milestone completed and archived
+last_activity: 2026-03-23 - Completed quick task 260323-k4t: Fix GitHub Actions build pipeline - missing Docker image tag in build-and-push step
 progress:
   total_phases: 4
   completed_phases: 4
@@ -60,6 +60,12 @@ None.
 ### Blockers/Concerns
 
 None active.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260323-k4t | Fix GitHub Actions build pipeline - missing Docker image tag in build-and-push step | 2026-03-23 | b3affc2 | [260323-k4t-fix-github-actions-build-pipeline-missin](./quick/260323-k4t-fix-github-actions-build-pipeline-missin/) |
 
 ## Session Continuity
 
