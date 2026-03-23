@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: MVP
 status: milestone_complete
 stopped_at: v1.0 milestone archived
-last_updated: "2026-03-23T14:19:55.000Z"
-last_activity: 2026-03-23 - Completed quick task 260323-l8f: Put KubeCon 2026 in the website title
+last_updated: "2026-03-23T14:33:36.000Z"
+last_activity: 2026-03-23 - Completed quick task 260323-lhx: Show user info in status bar and highlight own pod
 progress:
   total_phases: 4
   completed_phases: 4
@@ -70,9 +70,10 @@ None active.
 | 260323-krb | Update homelab level emojis on entry form | 2026-03-23 | 9c7632a | [260323-krb-update-homelab-level-emojis-on-entry-for](./quick/260323-krb-update-homelab-level-emojis-on-entry-for/) |
 | 260323-kz5 | Rename Guestbook to Guestpods with KubeCon 2026 subtitle | 2026-03-23 | 1432782 | [260323-kz5-rename-guestbook-to-guestpods-with-kubec](./quick/260323-kz5-rename-guestbook-to-guestpods-with-kubec/) |
 | 260323-l8f | Put KubeCon 2026 in the website title | 2026-03-23 | 264acc8 | [260323-l8f-put-kubecon-2026-in-the-website-title-to](./quick/260323-l8f-put-kubecon-2026-in-the-website-title-to/) |
+| 260323-lhx | Show user info in status bar and highlight own pod | 2026-03-23 | b6b00e0 | [260323-lhx-show-user-info-in-status-bar-and-highlig](./quick/260323-lhx-show-user-info-in-status-bar-and-highlig/) |
 
 ## Session Continuity
 
 Last session: 2026-03-23
-Stopped at: Completed quick task 260323-l8f
+Stopped at: Completed quick task 260323-lhx
 Resume file: None
