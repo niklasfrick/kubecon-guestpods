@@ -23,6 +23,14 @@ interface ViewTransform {
 export const podCount = signal(0);
 export const nsCount = signal(0);
 
+/** Current user info from localStorage (set after form submission). */
+const storedSubmission = localStorage.getItem('guestbook_submission');
+const parsedSubmission = storedSubmission ? JSON.parse(storedSubmission) as SubmitResponse : null;
+export const currentUserId = signal<number | null>(parsedSubmission?.id ?? null);
+export const currentUserInfo = signal<{ name: string; countryFlag: string; homelabEmoji: string } | null>(
+  parsedSubmission ? { name: parsedSubmission.name, countryFlag: parsedSubmission.country_flag, homelabEmoji: parsedSubmission.homelab_emoji } : null
+);
+
 /** Check if user prefers reduced motion. */
 const prefersReducedMotion =
   typeof window !== 'undefined' &&
