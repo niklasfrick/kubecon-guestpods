@@ -1,5 +1,5 @@
 {
-  "name": "kubecon-guestbook-web",
+  "name": "kubecon-guestpods-web",
   "private": true,
   "type": "module",
   "scripts": {
