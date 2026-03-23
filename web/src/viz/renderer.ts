@@ -5,6 +5,7 @@ import {
   LEVEL_COLORS, BG_COLOR, CLUSTER_FILL, BADGE_BG,
   FONT_STACK, POD_WIDTH, POD_HEIGHT, POD_RADIUS,
 } from './colors';
+import { currentUserId } from './VizPage';
 
 const ANIM_DURATION = 600;   // ms for scale-up animation
 const GLOW_DURATION = 2000;  // ms for glow fade-out
@@ -79,8 +80,14 @@ function drawPod(ctx: CanvasRenderingContext2D, node: PodNode): void {
   ctx.translate(node.x!, node.y!);
   ctx.scale(scale, scale);
 
-  // Glow effect (shadowBlur)
-  if (node.glowOpacity > 0) {
+  // Glow effect
+  const isCurrentUser = currentUserId.value !== null && node.id === currentUserId.value;
+  if (isCurrentUser) {
+    // Persistent glow for the user's own pod
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 20;
+  } else if (node.glowOpacity > 0) {
+    // Temporary entrance glow for other pods
     ctx.shadowColor = color;
     ctx.shadowBlur = 15 * node.glowOpacity;
   }
@@ -293,9 +300,15 @@ export function drawFrame(
     drawNamespaceLabel(ctx, cluster, clusters);
   }
 
-  // 6. Draw pods (sorted by animProgress so newly-animating pods draw on top)
+  // 6. Draw pods (sorted by animProgress so newly-animating pods draw on top;
+  //    user's own pod always draws last / on top for visibility)
   const visibleNodes = nodes.filter(n => n.animProgress > 0);
-  visibleNodes.sort((a, b) => a.animProgress - b.animProgress);
+  visibleNodes.sort((a, b) => {
+    const aIsUser = currentUserId.value !== null && a.id === currentUserId.value ? 1 : 0;
+    const bIsUser = currentUserId.value !== null && b.id === currentUserId.value ? 1 : 0;
+    if (aIsUser !== bIsUser) return aIsUser - bIsUser; // user's pod draws last (on top)
+    return a.animProgress - b.animProgress;
+  });
   for (const node of visibleNodes) {
     drawPod(ctx, node);
   }
