@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: MVP
 status: milestone_complete
 stopped_at: v1.0 milestone archived
-last_updated: "2026-03-23T14:10:38.000Z"
-last_activity: 2026-03-23 - Completed quick task 260323-kz5: Rename Guestbook to Guestpods with KubeCon 2026 subtitle
+last_updated: "2026-03-23T14:19:55.000Z"
+last_activity: 2026-03-23 - Completed quick task 260323-l8f: Put KubeCon 2026 in the website title
 progress:
   total_phases: 4
   completed_phases: 4
@@ -69,9 +69,10 @@ None active.
 | 260323-kcz | Change homelab level emojis - level 3 to laptop, level 4 to money-mouth face | 2026-03-23 | 4dc5b79 | [260323-kcz-change-homelab-level-emojis-level-3-to-l](./quick/260323-kcz-change-homelab-level-emojis-level-3-to-l/) |
 | 260323-krb | Update homelab level emojis on entry form | 2026-03-23 | 9c7632a | [260323-krb-update-homelab-level-emojis-on-entry-for](./quick/260323-krb-update-homelab-level-emojis-on-entry-for/) |
 | 260323-kz5 | Rename Guestbook to Guestpods with KubeCon 2026 subtitle | 2026-03-23 | 1432782 | [260323-kz5-rename-guestbook-to-guestpods-with-kubec](./quick/260323-kz5-rename-guestbook-to-guestpods-with-kubec/) |
+| 260323-l8f | Put KubeCon 2026 in the website title | 2026-03-23 | 264acc8 | [260323-l8f-put-kubecon-2026-in-the-website-title-to](./quick/260323-l8f-put-kubecon-2026-in-the-website-title-to/) |
 
 ## Session Continuity
 
 Last session: 2026-03-23
-Stopped at: Completed quick task 260323-kz5
+Stopped at: Completed quick task 260323-l8f
 Resume file: None
