@@ -5,6 +5,10 @@ metadata:
   name: {{ include "guestbook.fullname" . }}
   labels:
     {{- include "guestbook.labels" . | nindent 4 }}
+  {{- with .Values.httpRoute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}

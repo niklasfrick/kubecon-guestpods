@@ -37,6 +37,7 @@ service:
 # Gateway API HTTPRoute
 httpRoute:
   enabled: true
+  annotations: {}
   gateway:
     name: main-gateway
     namespace: default
@@ -61,3 +62,15 @@ probes:
     path: /api/health
     initialDelaySeconds: 3
     periodSeconds: 10
+
+# Extra Kubernetes objects to deploy alongside the chart
+# Each entry is a complete Kubernetes manifest
+extraObjects: []
+# Example:
+# extraObjects:
+#   - apiVersion: v1
+#     kind: Secret
+#     metadata:
+#       name: my-secret
+#     stringData:
+#       key: value
