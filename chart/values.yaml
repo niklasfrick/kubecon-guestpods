@@ -41,7 +41,25 @@ httpRoute:
   gateway:
     name: main-gateway
     namespace: default
+    sectionName: ""
   domain: guestbook.example.com
+
+# Pod-level security context (distroless nonroot UID/GID 65532)
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level security context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
 
 # Resource limits
 resources:
@@ -49,7 +67,6 @@ resources:
     cpu: 50m
     memory: 64Mi
   limits:
-    cpu: 500m
     memory: 256Mi
 
 # Health probes

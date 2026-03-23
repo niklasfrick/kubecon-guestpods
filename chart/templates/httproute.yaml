@@ -13,6 +13,7 @@ spec:
   parentRefs:
     - name: {{ .Values.httpRoute.gateway.name }}
       namespace: {{ .Values.httpRoute.gateway.namespace }}
+      sectionName: {{ .Values.httpRoute.gateway.sectionName | default "" }}
   hostnames:
     - {{ .Values.httpRoute.domain | quote }}
   rules:
