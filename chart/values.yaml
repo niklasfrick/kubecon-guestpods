@@ -42,13 +42,6 @@ httpRoute:
     namespace: default
   domain: guestbook.example.com
 
-# TLS via cert-manager Certificate resource
-tls:
-  enabled: true
-  issuer: letsencrypt-prod
-  issuerKind: ClusterIssuer  # ClusterIssuer or Issuer
-  secretName: guestbook-tls
-
 # Resource limits
 resources:
   requests:
